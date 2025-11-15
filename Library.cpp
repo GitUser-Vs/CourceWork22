@@ -118,19 +118,23 @@ void Library::processLending(int BookID, int UserID)
     Book* book = findBookById(BookID);
     User* user = findUserById(UserID);
 
-    if (book && user) {
-        if (user->borrowBook()) {
-            book->decreaseAvailable();
-            std::cout << "Lending successful. Book '" << book->getTitle() << "' lent to '" << user->getName() << "'." << std::endl;
-        }
-        else {
-            std::cout << "Lending failed. User '" << user->getName() << "' has reached maximum borrowed books." << std::endl;
-        }
+    if (!user) {
+        std::cout << "Lending failed. User with ID " << UserID << " not found." << std::endl;
+        return;
+    }
+    if (!book) {
+        std::cout << "Lending failed. Book with ID " << BookID << " not found." << std::endl;
+        return;
+    }
+
+    if (user->borrowBook()) {
+        book->decreaseAvailable();
+        std::cout << "Lending successful. Book '" << book->getTitle() << "' lent to '" << user->getName() << "'." << std::endl;
     }
     else {
-        if (!book) std::cout << "Lending failed. Book with ID " << BookID << " not found." << std::endl;
-        if (!user) std::cout << "Lending failed. User with ID " << UserID << " not found." << std::endl;
+        std::cout << "Lending failed. User '" << user->getName() << "' has reached maximum borrowed books." << std::endl;
     }
+
 }
 
 void Library::processReturn(int BookID, int UserID)
@@ -138,24 +142,6 @@ void Library::processReturn(int BookID, int UserID)
     std::cout << "\nProcessing return for Book ID " << BookID << " by User ID " << UserID << "..." << std::endl;
     Book* book = findBookById(BookID);
     User* user = findUserById(UserID);
-
-   /* if (book && user) {
-        if (user->returnBook()) {
-            book->increaseAvailable();
-            std::cout << "Return successful. Book '" << book->getTitle() << "' returned by '" << user->getName() << "'." << std::endl;
-            int daysOverdue = 3;
-            double fine = m_fineCalculator->calculateFine(daysOverdue);
-            std::cout << "  Fine calculated: $" << fine << std::endl;
-        }
-        else {
-            std::cout << "Return failed. User '" << user->getName() << "' has no books borrowed (or error in tracking)." << std::endl;
-        }
-    }
-    else {
-        if (!book) std::cout << "Return failed. Book with ID " << BookID << " not found." << std::endl;
-        if (!user) std::cout << "Return failed. User with ID " << UserID << " not found." << std::endl;
-    }*/
-
 
     if (!user) {
         std::cout << "Return failed. User with ID " << UserID << " not found." << std::endl;
