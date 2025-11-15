@@ -1,5 +1,4 @@
-#ifndef FINECALCULATOR_HPP
-#define FINECALCULATOR_HPP
+#pragma once
 
 #include <iostream>
 
@@ -13,7 +12,7 @@ public:
     // constructors and destructor
     FineCalculator();
     FineCalculator(double finePerDay);
-    ~FineCalculator();
+    ~FineCalculator() = default;
 
     // public methods
     double calculateFine(int daysOverdue) const;
@@ -21,5 +20,3 @@ public:
     // getter (if required)
     double getFinePerDay() const;
 };
-
-#endif

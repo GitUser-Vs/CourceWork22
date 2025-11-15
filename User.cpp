@@ -12,11 +12,6 @@ User::User(int UserID, const String& name, const String& email, int maxBorrowedC
     
 }
 
-User::~User()
-{
-
-}
-
 // public methods
 void User::displayInfo() const
 {

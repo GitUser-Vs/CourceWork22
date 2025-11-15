@@ -1,17 +1,6 @@
 #include "ReportGenerator.hpp"
 #include <iostream>
 
-// constructor and destructor
-ReportGenerator::ReportGenerator()
-{
-
-}
-
-ReportGenerator::~ReportGenerator()
-{
-
-}
-
 // public methods
 void ReportGenerator::generate(const String& reportType) const
 {

@@ -139,7 +139,7 @@ void Library::processReturn(int BookID, int UserID)
     Book* book = findBookById(BookID);
     User* user = findUserById(UserID);
 
-    if (book && user) {
+   /* if (book && user) {
         if (user->returnBook()) {
             book->increaseAvailable();
             std::cout << "Return successful. Book '" << book->getTitle() << "' returned by '" << user->getName() << "'." << std::endl;
@@ -154,6 +154,27 @@ void Library::processReturn(int BookID, int UserID)
     else {
         if (!book) std::cout << "Return failed. Book with ID " << BookID << " not found." << std::endl;
         if (!user) std::cout << "Return failed. User with ID " << UserID << " not found." << std::endl;
+    }*/
+
+
+    if (!user) {
+        std::cout << "Return failed. User with ID " << UserID << " not found." << std::endl;
+        return;
+    }
+    if (!book) {
+        std::cout << "Return failed. Book with ID " << BookID << " not found." << std::endl;
+        return;
+    }
+
+    if (user->returnBook()) {
+        book->increaseAvailable();
+        std::cout << "Return successful. Book '" << book->getTitle() << "' returned by '" << user->getName() << "'." << std::endl;
+        int daysOverdue = 3;
+        double fine = m_fineCalculator->calculateFine(daysOverdue);
+        std::cout << "  Fine calculated: $" << fine << std::endl;
+    }
+    else {
+        std::cout << "Return failed. User '" << user->getName() << "' has no books borrowed (or error in tracking)." << std::endl;
     }
 }
 

@@ -1,5 +1,4 @@
-#ifndef REPORTGENERATOR_HPP
-#define REPORTGENERATOR_HPP
+#pragma once
 
 #include <string>
 #include <iostream>
@@ -16,11 +15,10 @@ class ReportGenerator
 
 public:
     // constructor and destructor
-    ReportGenerator();
-    ~ReportGenerator();
+    ReportGenerator() = default;
+    ~ReportGenerator() = default;
 
     // public
     void generate(const String& ReportType) const;
 
 };
-#endif

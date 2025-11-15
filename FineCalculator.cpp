@@ -12,18 +12,10 @@ FineCalculator::FineCalculator(double finePerDay) : m_finePerDay(finePerDay > 0 
 
 }
 
-FineCalculator::~FineCalculator()
-{
-
-}
-
 // public methods
 double FineCalculator::calculateFine(int daysOverdue) const
 {
-    if (daysOverdue > 0) {
-        return daysOverdue * m_finePerDay;
-    }
-    return 0.0; // There is no penalty if there is no delay
+	return  (daysOverdue > 0) ? (daysOverdue * m_finePerDay) : 0.0;
 }
 
 // Getter

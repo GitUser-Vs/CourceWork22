@@ -1,5 +1,4 @@
-#ifndef LIBRARY_HPP
-#define LIBRARY_HPP
+#pragma once
 
 #include "FineCalculator.hpp"
 #include "SearchEngine.hpp"
@@ -62,5 +61,3 @@ public:
     void generateLibraryReport();
 
 };
-
-#endif

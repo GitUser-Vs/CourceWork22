@@ -1,3 +1,5 @@
+#pragma once
+
 #include <string>
 #include <iostream>
 
@@ -18,7 +20,7 @@ public:
     // constructors and destructor
     User();
     User(int UserID, const String& name, const String& email, int maxBorrowedCount);
-    ~User();
+    ~User() = default;
 
     // public methods
     void displayInfo() const;

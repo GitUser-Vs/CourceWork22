@@ -1,5 +1,4 @@
-#ifndef SEARCHENGINE_HPP
-#define SEARCHENGINE_HPP
+#pragma once
 
 #include <string>
 #include <iostream>
@@ -15,12 +14,10 @@ class SearchEngine
 
 public:
     // constructor and destructor
-    SearchEngine();
-    ~SearchEngine();
+    SearchEngine() = default;
+    ~SearchEngine() = default;
 
     // public methods
     void searchBooks (const String& query) const;
     void searchUsers(const String& query) const;
 };
-
-#endif

@@ -1,3 +1,4 @@
+#pragma once
 #include <string>
 #include <iostream>
 
@@ -19,7 +20,7 @@ public:
     // constructors and destructor
     Book();
     Book(int BookID, const String& title, const String& author, int quantity);
-    ~Book();
+    ~Book() = default;
 
     // public methods
     void displayInfo() const;

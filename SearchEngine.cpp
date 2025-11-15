@@ -1,17 +1,6 @@
 #include "SearchEngine.hpp"
 #include <iostream>
 
-// constructor and destructor
-SearchEngine::SearchEngine()
-{
-
-}
-
-SearchEngine::~SearchEngine()
-{
-
-}
-
 // public methods
 void SearchEngine::searchBooks(const String& query) const
 {

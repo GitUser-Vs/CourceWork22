@@ -12,11 +12,6 @@ Book::Book(int BookID, const String& title, const String& author, int quantity)
 
 }
 
-Book::~Book()
-{
-
-}
-
 // public methods
 void Book::displayInfo() const
 {
