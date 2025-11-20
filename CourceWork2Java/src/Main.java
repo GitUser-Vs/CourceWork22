@@ -132,7 +132,7 @@ public class Main {
         System.out.println("\n--- Demonstration Finished ---");
         // There is no explicit delete MyLibrary; the garbage collector takes care of it.
         
-        // Задержка экрана
+        // Screen delay
         try {
         	System.in.read();
      	} catch(Exception e) {}
