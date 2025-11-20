@@ -19,7 +19,7 @@ public class Book {
         this.title = title;
         this.author = author;
         this.quantity = quantity;
-        this.available = quantity; // Initially, all are available
+        this.available = quantity;
     }
 
     // Public methods

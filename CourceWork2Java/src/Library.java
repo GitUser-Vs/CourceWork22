@@ -141,24 +141,29 @@ public class Library {
         System.out.println("\nProcessing lending for Book ID " + bookId + " to User ID " + userId + "...");
         Book book = findBookById(bookId);
         User user = findUserById(userId);
+        
+        if (book == null) {
+            System.out.println("Lending failed. Book with ID " + bookId + " not found.");
+            return;
+        }
 
-        if (book != null && user != null) {
-            if (user.borrowBook()) {
-                book.decreaseAvailable();
-                System.out.println("Lending successful. Book '" + book.getTitle() + "' lent to '" + user.getName() + "'.");
+        if (user == null) {
+            System.out.println("Lending failed. User with ID " + userId + " not found.");
+            return;
+        }
 
-                // Creating a new transaction for this issue
-                LocalDate issueDate = LocalDate.now();
-                LocalDate dueDate = issueDate.plusDays(14); // Calculation of the DueDate (for example, +14 days)
+        if (user.borrowBook()) {
+            book.decreaseAvailable();
+            System.out.println("Lending successful. Book '" + book.getTitle() + "' lent to '" + user.getName() + "'.");
 
-                Transaction newTransaction = new Transaction(nextTransactionId++, bookId, userId, issueDate, dueDate);
-                addTransaction(newTransaction); // Adding a transaction to the system
-            } else {
-                System.out.println("Lending failed. User '" + user.getName() + "' has reached maximum borrowed books.");
-            }
+            // Creating a new transaction for this issue
+            LocalDate issueDate = LocalDate.now();
+            LocalDate dueDate = issueDate.plusDays(14);
+
+            Transaction newTransaction = new Transaction(nextTransactionId++, bookId, userId, issueDate, dueDate);
+            addTransaction(newTransaction);
         } else {
-            if (book == null) System.out.println("Lending failed. Book with ID " + bookId + " not found.");
-            if (user == null) System.out.println("Lending failed. User with ID " + userId + " not found.");
+            System.out.println("Lending failed. User '" + user.getName() + "' has reached maximum borrowed books.");
         }
     }
 
@@ -167,33 +172,39 @@ public class Library {
         Book book = findBookById(bookId);
         User user = findUserById(userId);
 
-        if (book != null && user != null) {
-            Transaction activeTransaction = findActiveTransactionByBookUser(bookId, userId); // We find an active transaction
-
-            if (activeTransaction != null) {
-                LocalDate returnDate = LocalDate.now();
-                double fine = 0.0;
-
-                // Calculation of the fine if there is a delay
-                if (returnDate.isAfter(activeTransaction.getDueDate())) {
-                    long daysOverdue = ChronoUnit.DAYS.between(activeTransaction.getDueDate(), returnDate);
-                    fine = fineCalculator.calculateFine((int) daysOverdue);
-                }
-
-                activeTransaction.markAsReturned(returnDate, fine); // Updating the transaction
-                book.increaseAvailable();
-                System.out.println("Return successful. Book '" + book.getTitle() + "' returned by '" + user.getName() + "'.");
-                if (fine > 0) {
-                    System.out.println("  Fine incurred: $" + String.format("%.2f", fine));
-                }
-                user.returnBook(); // Updating the tag in User
-            } else {
-                System.out.println("Return failed. No active lending transaction found for Book ID " + bookId + " and User ID " + userId + ".");
-            }
-        } else {
-            if (book == null) System.out.println("Return failed. Book with ID " + bookId + " not found.");
-            if (user == null) System.out.println("Return failed. User with ID " + userId + " not found.");
+        if (book == null) {
+            System.out.println("Return failed. Book with ID " + bookId + " not found.");
+            return;
         }
+
+        if (user == null) {
+            System.out.println("Return failed. User with ID " + userId + " not found.");
+            return;
+        }
+
+        Transaction activeTransaction = findActiveTransactionByBookUser(bookId, userId);
+
+        if (activeTransaction == null) {
+            System.out.println("Return failed. No active lending transaction found for Book ID " + bookId + " and User ID " + userId + ".");
+            return;
+        }
+
+        LocalDate returnDate = LocalDate.now();
+        double fine = 0.0;
+
+        // Calculation of the fine if there is a delay
+        if (returnDate.isAfter(activeTransaction.getDueDate())) {
+            long daysOverdue = ChronoUnit.DAYS.between(activeTransaction.getDueDate(), returnDate);
+            fine = fineCalculator.calculateFine((int) daysOverdue);
+        }
+
+        activeTransaction.markAsReturned(returnDate, fine); // Updating the transaction
+        book.increaseAvailable();
+        System.out.println("Return successful. Book '" + book.getTitle() + "' returned by '" + user.getName() + "'.");
+        if (fine > 0) {
+            System.out.println("  Fine incurred: $" + String.format("%.2f", fine));
+        }
+        user.returnBook(); // Updating the tag in User
     }
 
     public void performSearch(String query) {
