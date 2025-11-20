@@ -27,7 +27,7 @@ public class Main {
     public static void demonstrateArrayOfObjects() {
         System.out.println("\n--- Demonstrating Array of Objects (Array of References) ---");
         int arraySize = 3;
-        Book[] bookArray = new Book[arraySize]; // Массив ссылок на Book. Элементы null по умолчанию.
+        Book[] bookArray = new Book[arraySize]; // An array of links to the Book. Null elements by default.
 
         // Explicitly create objects and assign references to the array
         bookArray[0] = new Book(101, "The Hitchhiker's Guide to the Galaxy", "Douglas Adams", 5);
