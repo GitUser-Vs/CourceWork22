@@ -3,8 +3,6 @@
 #include <string>
 #include <iostream>
 
-using String = std::string;
-
 // forward declaration
 class Book;
 class User;
@@ -19,6 +17,6 @@ public:
     ~ReportGenerator() = default;
 
     // public
-    void generate(const String& ReportType) const;
+    void generate(const std::string& ReportType) const;
 
 };

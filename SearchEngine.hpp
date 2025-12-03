@@ -3,8 +3,6 @@
 #include <string>
 #include <iostream>
 
-using String = std::string; // type alias
-
 // forward declaration
 class Book;
 class User;
@@ -18,6 +16,6 @@ public:
     ~SearchEngine() = default;
 
     // public methods
-    void searchBooks (const String& query) const;
-    void searchUsers(const String& query) const;
+    void searchBooks (const std::string& query) const;
+    void searchUsers(const std::string& query) const;
 };

@@ -6,7 +6,7 @@ Book::Book() : m_BookID(0), m_title("Unknown Title"), m_author("Unknown Author")
 
 }
 
-Book::Book(int BookID, const String& title, const String& author, int quantity)
+Book::Book(int BookID, const std::string& title, const std::string& author, int quantity)
     : m_BookID(BookID), m_title(title), m_author(author), m_quantity(quantity), m_available(quantity)
 {
 
@@ -38,7 +38,7 @@ void Book::increaseAvailable()
 
 // getters
 int Book::getBookID() const { return m_BookID; }
-String Book::getTitle() const { return m_title; }
-String Book::getAuthor() const { return m_author; }
+std::string Book::getTitle() const { return m_title; }
+std::string Book::getAuthor() const { return m_author; }
 int Book::getQuantity() const { return m_quantity; }
 int Book::getAvailable() const { return m_available; }

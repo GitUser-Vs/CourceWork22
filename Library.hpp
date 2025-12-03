@@ -10,8 +10,6 @@
 class Book;
 class User;
 
-using String = std::string;
-
 class Library
 {
 public:
@@ -20,8 +18,8 @@ public:
 
 private:
     // private variables
-    String m_name;
-    String m_address;
+    std::string m_name;
+    std::string m_address;
 
     Book* m_booksArray;
     int m_bookCount;
@@ -38,7 +36,7 @@ private:
 public:
     // constructors and destructor
     Library();
-    Library(const String& name, const String& address, int maxBooks, int maxUsers);
+    Library(const std::string& name, const std::string& address, int maxBooks, int maxUsers);
     ~Library();
 
     // public methods
@@ -57,7 +55,7 @@ public:
     // methods using aggregated objects
     void processLending(int BookID, int UserID);
     void processReturn(int BookID, int UserID);
-    void performSearch(const String& query);
+    void performSearch(const std::string& query);
     void generateLibraryReport();
 
 };

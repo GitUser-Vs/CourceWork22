@@ -1,9 +1,7 @@
 #pragma once
 #include <string>
 #include <iostream>
-
-// Use "using" to shorten the record, as in the example
-using String = std::string;
+#include <memory> // Äëÿ std::shared_ptr è std::unique_ptr
 
 class Book
 {
@@ -11,15 +9,15 @@ class Book
 private:
     // private variables
     int m_BookID;
-    String m_title;
-    String m_author;
+    std::string m_title;
+    std::string m_author;
     int m_quantity;
     int m_available;
 
 public:
     // constructors and destructor
     Book();
-    Book(int BookID, const String& title, const String& author, int quantity);
+    Book(int BookID, const std::string& title, const std::string& author, int quantity);
     ~Book() = default;
 
     // public methods
@@ -29,8 +27,8 @@ public:
 
     // Getters for accessing private fields (for demonstration)
     int getBookID() const;
-    String getTitle() const;
-    String getAuthor() const;
+    std::string getTitle() const;
+    std::string getAuthor() const;
     int getQuantity() const;
     int getAvailable() const;
 };

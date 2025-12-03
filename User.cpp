@@ -6,7 +6,7 @@ User::User() : m_UserID(0), m_name("Unknown User"), m_email(""), m_borrowedCount
 
 }
 
-User::User(int UserID, const String& name, const String& email, int maxBorrowedCount)
+User::User(int UserID, const std::string& name, const std::string& email, int maxBorrowedCount)
     : m_UserID(UserID), m_name(name), m_email(email), m_borrowedCount(0), m_maxBorrowedCount(maxBorrowedCount)
 {
     
@@ -41,7 +41,7 @@ bool User::returnBook()
 
 //getters
 int User::getUserID() const { return m_UserID; }
-String User::getName() const { return m_name; }
-String User::getEmail() const { return m_email; }
+std::string User::getName() const { return m_name; }
+std::string User::getEmail() const { return m_email; }
 int User::getBorrowedCount() const { return m_borrowedCount; }
 int User::getMaxBorrowedCount() const { return m_maxBorrowedCount; }

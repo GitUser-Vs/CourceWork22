@@ -14,7 +14,7 @@ Library::Library()
 
 }
 
-Library::Library(const String& name, const String& address, int maxBooks, int maxUsers)
+Library::Library(const std::string& name, const std::string& address, int maxBooks, int maxUsers)
     : m_name(name), m_address(address),
     m_bookCount(0), m_maxBooks(maxBooks > 0 ? maxBooks : 100),
     m_userCount(0), m_maxUsers(maxUsers > 0 ? maxUsers : 50),
@@ -164,7 +164,7 @@ void Library::processReturn(int BookID, int UserID)
     }
 }
 
-void Library::performSearch(const String& query)
+void Library::performSearch(const std::string& query)
 {
     std::cout << "\nPerforming search in Library..." << std::endl;
     m_searchEngine->searchBooks(query);
