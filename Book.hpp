@@ -1,7 +1,6 @@
 #pragma once
 #include <string>
 #include <iostream>
-#include <memory> // Äëÿ std::shared_ptr è std::unique_ptr
 
 class Book
 {
@@ -18,7 +17,17 @@ public:
     // constructors and destructor
     Book();
     Book(int BookID, const std::string& title, const std::string& author, int quantity);
+    Book(const Book& other);
     ~Book() = default;
+
+    // Overloading the assignment operator by copying
+    Book& operator<<=(const Book& other); // An example of an operator similar to assignment
+
+    // Operator overload
+    bool operator==(const Book& other) const;
+
+    // Friendly function (declaration inside the class)
+    friend std::ostream& operator<<(std::ostream& os, const Book& book);
 
     // public methods
     void displayInfo() const;

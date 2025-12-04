@@ -12,14 +12,58 @@ Book::Book(int BookID, const std::string& title, const std::string& author, int 
 
 }
 
+// Конструктор копирования
+Book::Book(const Book& other)
+    : m_BookID(other.m_BookID),
+    m_title(other.m_title),
+    m_author(other.m_author),
+    m_quantity(other.m_quantity),
+    m_available(other.m_available)
+{
+
+}
+
+// --- Перегрузка операторов ---
+
+// Перегрузка оператора присваивания копированием
+Book& Book::operator<<=(const Book& other)
+{
+    if (this != &other) // Проверка на самоприсваивание
+    {
+        m_BookID = other.m_BookID;
+        m_title = other.m_title;
+        m_author = other.m_author;
+        m_quantity = other.m_quantity;
+        m_available = other.m_available;
+        
+    }
+    return *this; // Возвращаем ссылку на текущий объект
+}
+
+// Перегрузка оператора
+bool Book::operator==(const Book& other) const
+{
+    // Сравниваем по ID, как самый уникальный идентификатор
+    return m_BookID == other.m_BookID;
+}
+
+// Дружественная функция для перегрузки оператора
+std::ostream& operator<<(std::ostream& os, const Book& book)
+{
+    os << "Book ID: " << book.m_BookID
+        << ", Title: \"" << book.m_title << "\""
+        << ", Author: " << book.m_author
+        << ", Quantity: " << book.m_quantity
+        << ", Available: " << book.m_available;
+    return os;
+}
+
+
 // public methods
 void Book::displayInfo() const
 {
-    std::cout << "Book ID: " << m_BookID
-        << ", Title: " << m_title
-        << ", Author: " << m_author
-        << ", Quantity: " << m_quantity
-        << ", Available: " << m_available << std::endl;
+    // используем перегруженный оператор <<
+    std::cout << *this << std::endl;
 }
 
 void Book::decreaseAvailable()
