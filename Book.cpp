@@ -12,7 +12,7 @@ Book::Book(int BookID, const std::string& title, const std::string& author, int 
 
 }
 
-// Конструктор копирования
+// Copy constructor
 Book::Book(const Book& other)
     : m_BookID(other.m_BookID),
     m_title(other.m_title),
@@ -23,12 +23,12 @@ Book::Book(const Book& other)
 
 }
 
-// --- Перегрузка операторов ---
+// --- Operator overload ---
 
-// Перегрузка оператора присваивания копированием
+// Overloading the assignment operator by copying
 Book& Book::operator<<=(const Book& other)
 {
-    if (this != &other) // Проверка на самоприсваивание
+    if (this != &other) // Checking for self-sealing
     {
         m_BookID = other.m_BookID;
         m_title = other.m_title;
@@ -37,17 +37,17 @@ Book& Book::operator<<=(const Book& other)
         m_available = other.m_available;
         
     }
-    return *this; // Возвращаем ссылку на текущий объект
+    return *this; // Returning the link to the current object
 }
 
-// Перегрузка оператора
+// Operator overload
 bool Book::operator==(const Book& other) const
 {
-    // Сравниваем по ID, как самый уникальный идентификатор
+    // Comparing by ID
     return m_BookID == other.m_BookID;
 }
 
-// Дружественная функция для перегрузки оператора
+// User-friendly function for operator overload
 std::ostream& operator<<(std::ostream& os, const Book& book)
 {
     os << "Book ID: " << book.m_BookID
@@ -62,7 +62,7 @@ std::ostream& operator<<(std::ostream& os, const Book& book)
 // public methods
 void Book::displayInfo() const
 {
-    // используем перегруженный оператор <<
+    // We use the overloaded operator
     std::cout << *this << std::endl;
 }
 
