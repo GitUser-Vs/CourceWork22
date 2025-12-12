@@ -1,69 +1,65 @@
 #include "Book.hpp"
 
-// constructors and destructor
-Book::Book() : m_BookID(0), m_title("Unknown Title"), m_author("Unknown Author"), m_quantity(0), m_available(0)
+// --- Дружественная функция ---
+void displayBookDetails(const Book& book)
 {
-
+    std::cout << "[Details] Book ID: " << book.m_bookId
+        << ", Title: \"" << book.m_title << "\""
+        << ", Author: " << book.m_author
+        << ", Total: " << book.m_quantity
+        << ", Available: " << book.m_available;
 }
 
-Book::Book(int BookID, const std::string& title, const std::string& author, int quantity)
-    : m_BookID(BookID), m_title(title), m_author(author), m_quantity(quantity), m_available(quantity)
+// --- Перегрузка оператора ---
+std::ostream& operator<<(std::ostream& os, const Book& book)
 {
+    os << "Book(ID: " << book.m_bookId
+        << ", Title: \"" << book.m_title << "\""
+        << ", Author: " << book.m_author
+        << ", Qty: " << book.m_quantity
+        << ", Avail: " << book.m_available << ")";
+    return os;
+}
 
+// constructors and destructor
+Book::Book() : m_bookId(0), m_title("Unknown Title"), m_author("Unknown Author"), m_quantity(0), m_available(0)
+{
+}
+
+Book::Book(int bookId, const std::string& title, const std::string& author, int quantity)
+    : m_bookId(bookId), m_title(title), m_author(author), m_quantity(quantity), m_available(quantity)
+{
 }
 
 // Copy constructor
 Book::Book(const Book& other)
-    : m_BookID(other.m_BookID),
+    : m_bookId(other.m_bookId),
     m_title(other.m_title),
     m_author(other.m_author),
     m_quantity(other.m_quantity),
     m_available(other.m_available)
 {
-
 }
 
-// --- Operator overload ---
-
-// Overloading the assignment operator by copying
-Book& Book::operator<<=(const Book& other)
+// --- Оператор присваивания копированием ---
+Book& Book::operator=(const Book& other)
 {
-    if (this != &other) // Checking for self-sealing
+    if (this != &other) // Защита от самоприсваивания
     {
-        m_BookID = other.m_BookID;
+        m_bookId = other.m_bookId;
         m_title = other.m_title;
         m_author = other.m_author;
         m_quantity = other.m_quantity;
         m_available = other.m_available;
-        
     }
-    return *this; // Returning the link to the current object
+    return *this;
 }
-
-// Operator overload
-bool Book::operator==(const Book& other) const
-{
-    // Comparing by ID
-    return m_BookID == other.m_BookID;
-}
-
-// User-friendly function for operator overload
-std::ostream& operator<<(std::ostream& os, const Book& book)
-{
-    os << "Book ID: " << book.m_BookID
-        << ", Title: \"" << book.m_title << "\""
-        << ", Author: " << book.m_author
-        << ", Quantity: " << book.m_quantity
-        << ", Available: " << book.m_available;
-    return os;
-}
-
 
 // public methods
 void Book::displayInfo() const
 {
-    // We use the overloaded operator
-    std::cout << *this << std::endl;
+    displayBookDetails(*this);
+    std::cout << std::endl; // Добавляем перевод строки
 }
 
 void Book::decreaseAvailable()
@@ -81,7 +77,7 @@ void Book::increaseAvailable()
 }
 
 // getters
-int Book::getBookID() const { return m_BookID; }
+int Book::getBookID() const { return m_bookId; }
 std::string Book::getTitle() const { return m_title; }
 std::string Book::getAuthor() const { return m_author; }
 int Book::getQuantity() const { return m_quantity; }

@@ -3,41 +3,43 @@
 #include "FineCalculator.hpp"
 #include "SearchEngine.hpp"
 #include "ReportGenerator.hpp"
+#include "Transaction.hpp"
 #include <string>
 #include <iostream>
-
-// Forward declarations for Book and User
-class Book;
-class User;
+#include <vector>
 
 class Library
 {
-public:
-    // static const int MAX_BOOKS = 1000;
-    // static const int MAX_USERS = 500;
 
 private:
     // private variables
     std::string m_name;
     std::string m_address;
 
-    Book* m_booksArray;
-    int m_bookCount;
-    int m_maxBooks;
+    // Использование std::vector для хранения объектов
+    std::vector<Book> m_books;
+    std::vector<User> m_users;
+    std::vector<Transaction> m_transactions;
 
-    User* m_usersArray;
-    int m_userCount;
-    int m_maxUsers;
+    size_t m_maxBooksCapacity;
+    size_t m_maxUsersCapacity;
+    size_t m_maxTransactionsCapacity;
 
-    FineCalculator* m_fineCalculator;
-    SearchEngine* m_searchEngine;
-    ReportGenerator* m_reportGenerator;
+    // Использование std::unique_ptr для управления агрегированными объектами
+    std::unique_ptr<FineCalculator> m_fineCalculator;
+    std::unique_ptr<SearchEngine> m_searchEngine;
+    std::unique_ptr<ReportGenerator> m_reportGenerator;
 
 public:
     // constructors and destructor
     Library();
-    Library(const std::string& name, const std::string& address, int maxBooks, int maxUsers);
-    ~Library();
+    Library(const std::string& name, const std::string& address,
+        size_t maxBooks = 1000, size_t maxUsers = 500, size_t maxTransactions = 10000); // Добавлены параметры для вместимости
+    Library(const Library& other); // Конструктор копирования
+    ~Library() = default;
+
+    // Перегрузка оператора присваивания копированием
+    Library& operator=(const Library& other);
 
     // public methods
     void displayLibraryInfo() const;
@@ -50,7 +52,13 @@ public:
     // methods for working with users
     void addUser(const User& user);
     void displayUsers() const;
-    User* findUserById(int UserID); // Возвращает указатель на пользователя
+    User* findUserById(int UserID); // Returns a pointer to the user
+
+     // Методы для работы с транзакциями
+    void addTransaction(const Transaction& transaction);
+    void displayTransactions() const;
+    Transaction* findTransactionById(int transactionId);
+    Transaction* findTransactionByBookUser(int bookId, int userId);
 
     // methods using aggregated objects
     void processLending(int BookID, int UserID);
@@ -58,4 +66,10 @@ public:
     void performSearch(const std::string& query);
     void generateLibraryReport();
 
+    // Пример дружественной функции для доступа к приватным данным (например, к вектору книг)
+    friend void printAllBookTitles(const Library& lib);
+
+    // Перегрузка оператора для вывода объекта Library
+    friend std::ostream& operator<<(std::ostream& os, const Library& library);
 };
+

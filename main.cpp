@@ -5,6 +5,7 @@
 #include "SearchEngine.hpp"
 #include "ReportGenerator.hpp"
 #include <iostream>
+#include <vector>
 
 // --- Demo functions ---
 
@@ -18,7 +19,7 @@ void demonstrateDynamicAllocation() {
 
     User* dynamicUser = new User(201, "Alice Wonderland", "alice@example.com", 3);
     dynamicUser->displayInfo();
-    dynamicUser->borrowBook();
+    dynamicUser->borrowBook(101);
     dynamicUser->displayInfo();
     delete dynamicUser; // Freeing up memory
     std::cout << "----------------------------------------------------" << std::endl;
@@ -38,7 +39,7 @@ void demonstratePointersAndReferences() {
     userRef.displayInfo();
 
     bookPtr->decreaseAvailable();
-    userRef.borrowBook();
+    userRef.borrowBook(1);
     std::cout << "After modifications:" << std::endl;
     staticBook.displayInfo();
     staticUser.displayInfo();
@@ -150,11 +151,40 @@ int main()
 
     myLibrary->displayBooks();
     myLibrary->displayUsers();
+    myLibrary->displayTransactions();
 
     myLibrary->performSearch("Huxley"); // Calling the SearchEngine method
     myLibrary->generateLibraryReport(); // Calling the ReportGenerator method
 
-    std::cout << "\nDirectly using FineCalculator (for demonstration):" << std::endl;
+    // Использование перегруженных операторов
+    std::cout << "\n--- Using overloaded operators ---" << std::endl;
+    std::cout << book1 << std::endl;
+    std::cout << user1 << std::endl;
+    std::cout << *myLibrary << std::endl; // Используем перегруженный << для Library
+
+    User tempUser(100, "Alice Smith", "alice.s@example.com", 5);
+    if (user1 == tempUser) { // Используем перегруженный ==
+        std::cout << "User1 and tempUser are the same user (by ID)." << std::endl;
+    }
+    std::cout << "---" << std::endl;
+
+
+    // Демонстрация работы с копированием Library
+    std::cout << "\n--- Demonstrating Library Copying ---" << std::endl;
+    Library* anotherLibrary = new Library("Branch Library", "456 Oak Ave");
+    *anotherLibrary = *myLibrary; // Оператор присваивания копированием
+    std::cout << "Copied myLibrary to anotherLibrary using assignment operator:" << std::endl;
+    anotherLibrary->displayLibraryInfo();
+    std::cout << *anotherLibrary << std::endl;
+
+    Library* copiedLibrary = new Library(*myLibrary); // Конструктор копирования
+    std::cout << "\nCreated copiedLibrary using copy constructor:" << std::endl;
+    copiedLibrary->displayLibraryInfo();
+    std::cout << *copiedLibrary << std::endl;
+
+    delete anotherLibrary;
+    delete copiedLibrary;
+    std::cout << "--- Library Copying Demo Finished ---" << std::endl;
 
     delete myLibrary;
 

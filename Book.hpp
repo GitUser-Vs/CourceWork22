@@ -7,7 +7,7 @@ class Book
 
 private:
     // private variables
-    int m_BookID;
+    int m_bookId;
     std::string m_title;
     std::string m_author;
     int m_quantity;
@@ -20,24 +20,24 @@ public:
     Book(const Book& other);
     ~Book() = default;
 
-    // Overloading the assignment operator by copying
-    Book& operator<<=(const Book& other); // An example of an operator similar to assignment
-
-    // Operator overload
-    bool operator==(const Book& other) const;
-
-    // Friendly function (declaration inside the class)
-    friend std::ostream& operator<<(std::ostream& os, const Book& book);
+    // Оператор присваивания копированием
+    Book& operator=(const Book& other);
 
     // public methods
     void displayInfo() const;
     void decreaseAvailable();
     void increaseAvailable();
 
-    // Getters for accessing private fields (for demonstration)
+    // Getters for accessing private fields
     int getBookID() const;
     std::string getTitle() const;
     std::string getAuthor() const;
     int getQuantity() const;
     int getAvailable() const;
+
+    // Дружественная функция для вывода информации
+    friend void displayBookDetails(const Book& book);
+
+    // Перегрузка оператора для удобного вывода объекта Book
+    friend std::ostream& operator<<(std::ostream& os, const Book& book);
 };
