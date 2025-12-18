@@ -5,12 +5,10 @@ public class Transaction {
     private int transactionId;
     private int bookId; // Storing the Book ID
     private int userId; // Storing the User ID
-
     private LocalDate issueDate;
     private LocalDate dueDate;
     private LocalDate returnDate; // It can be null if the book has not been returned yet.
     private boolean isReturned;
-
     private double fineAmount; // Fine if it was accrued
 
     // Formatter for date output
@@ -41,17 +39,9 @@ public class Transaction {
 
     // Public methods
     public void displayInfo() {
-        System.out.println("Transaction ID: " + transactionId +
-                           ", Book ID: " + bookId +
-                           ", User ID: " + userId +
-                           ", Issued: " + issueDate.format(DATE_FORMATTER) +
-                           ", Due: " + dueDate.format(DATE_FORMATTER));
-        if (isReturned) {
-            System.out.println("  Returned: " + returnDate.format(DATE_FORMATTER) +
-                               ", Fine: $" + String.format("%.2f", fineAmount)); // Форматирование штрафа
-        } else {
-            System.out.println("  Status: Outstanding");
-        }
+    	String status = isReturned ? "Returned" : "Active";
+        System.out.printf("  TID: %d | BookID: %d | UserID: %d | Due: %s | Status: %s | Fine: $%.2f%n",
+                          transactionId, bookId, userId, dueDate, status, fineAmount);
     }
 
     public void markAsReturned(LocalDate returnDate, double fine) {

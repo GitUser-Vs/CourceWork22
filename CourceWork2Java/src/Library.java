@@ -1,6 +1,7 @@
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.List; // Для использования List
 
 public class Library {
     private String name;
@@ -10,6 +11,8 @@ public class Library {
     private ArrayList<User> users;
     private ArrayList<Transaction> transactions; // New list for transactions
 
+    private static int nextTransactionId = 1; // Статическое поле для уникальных ID транзакций
+    
     // Aggregated objects
     private FineCalculator fineCalculator;
     private SearchEngine searchEngine;
@@ -17,15 +20,7 @@ public class Library {
 
     // Constructors
     public Library() {
-        this.name = "Unknown Library";
-        this.address = "Unknown Address";
-        this.books = new ArrayList<>();
-        this.users = new ArrayList<>();
-        this.transactions = new ArrayList<>();
-
-        this.fineCalculator = new FineCalculator();
-        this.searchEngine = new SearchEngine();
-        this.reportGenerator = new ReportGenerator();
+    	this("Unknown Library", "Unknown Address");
     }
 
     public Library(String name, String address) {
@@ -51,8 +46,21 @@ public class Library {
 
     // Methods for working with books
     public void addBook(Book book) {
-        books.add(book); // Adding a link to the object
-        System.out.println("Added book to library: '" + book.getTitle() + "'");
+    	try {
+            if (book == null) {
+                throw new IllegalArgumentException("Cannot add a null book to the library.");
+            }
+            // Проверка на дубликат по ID (требует equals/hashCode в Book)
+            for (Book existingBook : books) {
+                if (existingBook.equals(book)) {
+                    throw new IllegalArgumentException("Book with ID " + book.getBookId() + " already exists.");
+                }
+            }
+            books.add(book);
+            System.out.println("Added book to library: '" + book.getTitle() + "'");
+        } catch (IllegalArgumentException e) {
+            System.err.println("Error adding book: " + e.getMessage());
+        }
     }
 
     public void displayBooks() {
@@ -78,8 +86,20 @@ public class Library {
 
     // Methods for working with users
     public void addUser(User user) {
-        users.add(user); // Adding a link to the object
-        System.out.println("Added user to library: '" + user.getName() + "'");
+    	try {
+            if (user == null) {
+                throw new IllegalArgumentException("Cannot add a null user to the library.");
+            }
+             for (User existingUser : users) {
+                if (existingUser.equals(user)) {
+                    throw new IllegalArgumentException("User with ID " + user.getUserId() + " already exists.");
+                }
+            }
+            users.add(user);
+            System.out.println("Added user to library: '" + user.getName() + "'");
+        } catch (IllegalArgumentException e) {
+            System.err.println("Error adding user: " + e.getMessage());
+        }
     }
 
     public void displayUsers() {
@@ -104,7 +124,7 @@ public class Library {
     }
 
     // Methods for working with transactions
-    private int nextTransactionId = 1; // A simple ID generator for transactions
+    //private int nextTransactionId = 1; // A simple ID generator for transactions
 
     public void addTransaction(Transaction transaction) {
         transactions.add(transaction); // Adding a link to the object
@@ -190,33 +210,44 @@ public class Library {
         }
 
         LocalDate returnDate = LocalDate.now();
-        double fine = 0.0;
+        // Используем FineCalculator для расчета штрафа
+        double fine = fineCalculator.calculateFine(activeTransaction.getDueDate(), returnDate);
 
-        // Calculation of the fine if there is a delay
-        if (returnDate.isAfter(activeTransaction.getDueDate())) {
-            long daysOverdue = ChronoUnit.DAYS.between(activeTransaction.getDueDate(), returnDate);
-            fine = fineCalculator.calculateFine((int) daysOverdue);
-        }
-
-        activeTransaction.markAsReturned(returnDate, fine); // Updating the transaction
+        activeTransaction.markAsReturned(returnDate, fine);
         book.increaseAvailable();
         System.out.println("Return successful. Book '" + book.getTitle() + "' returned by '" + user.getName() + "'.");
         if (fine > 0) {
             System.out.println("  Fine incurred: $" + String.format("%.2f", fine));
         }
-        user.returnBook(); // Updating the tag in User
+        user.returnBook(); // Может бросить исключение, если нечего возвращать
     }
 
-    public void performSearch(String query) {
-        System.out.println("\nPerforming search in Library...");
-        // Delegating the call to the aggregated SearchEngine object
-        searchEngine.searchBooks(query);
-        searchEngine.searchUsers(query);
+ // Используем SearchEngine более эффективно
+    public List<Book> searchBooks(String query) {
+        System.out.println("\nPerforming book search in Library...");
+        return searchEngine.searchBooksByTitle(this.books, query); // Передаем весь список книг
     }
 
-    public void generateLibraryReport() {
-        System.out.println("\nGenerating report for Library...");
-        // Delegating the call to the aggregated ReportGenerator object
-        reportGenerator.generate("Library Overview");
+    public List<User> searchUsers(String query) {
+        System.out.println("\nPerforming user search in Library...");
+        return searchEngine.searchUsersByName(this.users, query); // Передаем весь список пользователей
+    }
+
+    // Используем ReportGenerator для генерации конкретных отчетов
+    public void generateBookReport() {
+        reportGenerator.generateBookReport(this.books);
+    }
+
+    public void generateUserReport() {
+        reportGenerator.generateUserReport(this.users);
+    }
+
+    public void generateTransactionReport() {
+        reportGenerator.generateTransactionReport(this.transactions);
+    }
+
+    // Общий отчет (как демонстрация)
+    public void generateGeneralReport(String reportType) {
+        reportGenerator.generateGeneralReport(reportType);
     }
 }
