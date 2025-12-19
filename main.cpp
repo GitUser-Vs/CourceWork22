@@ -4,91 +4,71 @@
 #include "FineCalculator.hpp"
 #include "SearchEngine.hpp"
 #include "ReportGenerator.hpp"
+#include "DigitalBook.hpp"
+#include "LibraryItem.hpp"
 #include <iostream>
 #include <vector>
 
 // --- Demo functions ---
 
-void demonstrateDynamicAllocation() {
-    std::cout << "\n--- Demonstrating Dynamic Allocation (new/delete) ---" << std::endl;
-    Book* dynamicBook = new Book(101, "The Hitchhiker's Guide to the Galaxy", "Douglas Adams", 5);
-    dynamicBook->displayInfo();
-    dynamicBook->decreaseAvailable();
-    dynamicBook->displayInfo();
-    delete dynamicBook; // Freeing up memory
+// --- Вспомогательная функция для демонстрации клонирования ---
+void demonstrateCloning(const LibraryItem* item) {
+    std::cout << "\n--- Demonstrating Cloning ---" << std::endl;
 
-    User* dynamicUser = new User(201, "Alice Wonderland", "alice@example.com", 3);
-    dynamicUser->displayInfo();
-    dynamicUser->borrowBook(101);
-    dynamicUser->displayInfo();
-    delete dynamicUser; // Freeing up memory
-    std::cout << "----------------------------------------------------" << std::endl;
+    if (!item) return;
+
+    std::cout << "Original Item Info: ";
+    item->displayInfo();
+
+    // Глубокое клонирование (через виртуальную функцию)
+    LibraryItem* clonedItem = item->clone();
+    std::cout << "Cloned Item Info: ";
+    clonedItem->displayInfo();
+
+    std::cout << "Cloned item address: " << clonedItem << std::endl;
+    std::cout << "Original item address: " << item << std::endl;
+
+    delete clonedItem;
+    std::cout << "Cloning demo complete." << std::endl;
 }
 
-void demonstratePointersAndReferences() {
-    std::cout << "\n--- Demonstrating Pointers and References ---" << std::endl;
-    Book staticBook(1, "1984", "George Orwell", 10);
-    User staticUser(1, "John Doe", "john.doe@example.com", 4);
+// --- Виртуальные функции ---
+void demonstrateVirtualFunctions() {
+    std::cout << "\n--- Demonstrating Virtual Functions (Polymorphism) ---" << std::endl;
 
-    Book* bookPtr = &staticBook;
-    std::cout << "Using pointer to Book: ";
-    bookPtr->displayInfo();
+    // Создаем статические объекты разных типов
+    Book physicalBook(991, "The Martian", "Andy Weir", 5);
+    DigitalBook eBook(992, "Dune E-Edition", "Frank Herbert", 10, "http://e.com/dune", 150);
 
-    User& userRef = staticUser;
-    std::cout << "Using reference to User: ";
-    userRef.displayInfo();
+    // Вызов через указатель на базовый класс
+    LibraryItem* itemPtr1 = &physicalBook;
+    LibraryItem* itemPtr2 = &eBook;
 
-    bookPtr->decreaseAvailable();
-    userRef.borrowBook(1);
-    std::cout << "After modifications:" << std::endl;
-    staticBook.displayInfo();
-    staticUser.displayInfo();
-    std::cout << "-------------------------------------------" << std::endl;
+    // Вызов виртуальной функции через указатель на базовый класс
+    std::cout << "Calling virtual displayInfo() via LibraryItem*:" << std::endl;
+    itemPtr1->displayInfo(); // Вызывается Book::displayInfo
+    itemPtr2->displayInfo(); // Вызывается DigitalBook::displayInfo
+
+    std::cout << "\nCalling non-virtual Book::displayExtendedInfo() via Book*:" << std::endl;
+    Book* bookPtr = &physicalBook;
+    bookPtr->displayExtendedInfo();
+
+    std::cout << "\nCalling non-virtual DigitalBook::displayExtendedInfo() via DigitalBook*:" << std::endl;
+    DigitalBook* dBookPtr = &eBook;
+    dBookPtr->displayExtendedInfo();
+
+    std::cout << "\nDemonstrate cloning of physical book:" << std::endl;
+    demonstrateCloning(&physicalBook);
 }
 
-void demonstrateDynamicArray() {
-    std::cout << "\n--- Demonstrating Dynamic Array of Objects ---" << std::endl;
-    int arraySize = 3;
-    Book* bookArr = new Book[arraySize]; // Creates arraySize Book objects
-
-    std::cout << "Created dynamic array of " << arraySize << " Books (default constructor called for each)." << std::endl;
-
-    for (int i = 0; i < arraySize; ++i) {
-        std::cout << "Book in array at index " << i << ":";
-        bookArr[i].displayInfo(); // Displaying information
-    }
-    delete[] bookArr;
-    std::cout << "Dynamic array of Books deleted." << std::endl;
-    std::cout << "---------------------------------------------" << std::endl;
-}
-
-void demonstrateArrayOfDynamicObjects() {
-    std::cout << "\n--- Demonstrating Array of Dynamic Objects ---" << std::endl;
-    int arraySize = 2;
-    User** usersPtrArray = new User * [arraySize];
-
-    usersPtrArray[0] = new User(301, "Bob Smith", "bob@example.com", 5);
-    usersPtrArray[1] = new User(302, "Charlie Brown", "charlie@example.com", 2);
-
-    std::cout << "Created array of pointers to User objects:" << std::endl;
-    for (int i = 0; i < arraySize; ++i) {
-        usersPtrArray[i]->displayInfo();
-    }
-
-    for (int i = 0; i < arraySize; ++i) {
-        delete usersPtrArray[i]; // Deleting each object
-    }
-    delete[] usersPtrArray; // Deleting the array of pointers
-    std::cout << "Array of dynamic User objects deleted." << std::endl;
-    std::cout << "----------------------------------------------------" << std::endl;
-}
-
-// --- Main Function main ---
+// --- Main Function ---
 int main()
 {
     std::cout << "--- Library Management System Demonstration ---" << std::endl;
 
-    // 1. Static initialization of objects
+    demonstrateVirtualFunctions();
+
+    // Static initialization of objects
     std::cout << "\n--- Demonstrating Static Initialization ---" << std::endl;
     Book book1(10, "1984", "George Orwell", 15);
     User user1(100, "Alice Smith", "alice.s@example.com", 5);
@@ -97,15 +77,16 @@ int main()
     user1.displayInfo();
     std::cout << "-----------------------------------------" << std::endl;
 
-    demonstratePointersAndReferences();
-    demonstrateDynamicAllocation();
-    demonstrateDynamicArray();
-    demonstrateArrayOfDynamicObjects();
-
-    // 2. Dynamic initialization of Library class objects
+    // Dynamic initialization of Library class objects
     std::cout << "\n--- Demonstrating Dynamic Initialization of Library ---" << std::endl;
+
     // Dynamically creating a Library with parameters
     Library* myLibrary = new Library("City Central Library", "123 Main St", 100, 50);
+
+    Book bookA(1, "The Great Novel", "A. Author", 10);
+    DigitalBook eBookB(2, "EBook Thriller", "B. Writer", 5, "http://e.com/thriller", 100);
+    User userX(50, "Cloner User", "clone@test.com", 5);
+
     myLibrary->displayLibraryInfo();
 
     // Creating Book and User objects to add to the library
@@ -120,6 +101,21 @@ int main()
     myLibrary->addBook(book3);
     myLibrary->addUser(user2);
     myLibrary->addUser(user3);
+
+    myLibrary->addUser(userX);
+    myLibrary->addBook(bookA);
+    myLibrary->addBook(eBookB);
+
+    // Демонстрация работы с клонированием
+    Book* foundBook = myLibrary->findBookById(1);
+    if (foundBook) {
+        demonstrateCloning(foundBook);
+    }
+
+    // Демонстрация доступа к protected полю через Book
+    if (foundBook) {
+        foundBook->checkProtectedAccess();
+    }
 
     // Adding a book created dynamically (passing by value, memory is released after)
     Book* dynamicBookForLib = new Book(40, "The Great Gatsby", "F. Scott Fitzgerald", 8);

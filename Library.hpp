@@ -66,7 +66,7 @@ public:
     void performSearch(const std::string& query);
     void generateLibraryReport();
 
-    // Пример дружественной функции для доступа к приватным данным (например, к вектору книг)
+    // Пример дружественной функции для доступа к приватным данным
     friend void printAllBookTitles(const Library& lib);
 
     // Перегрузка оператора для вывода объекта Library

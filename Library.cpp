@@ -80,7 +80,7 @@ Library::Library(const Library& other)
     m_maxBooksCapacity(other.m_maxBooksCapacity),
     m_maxUsersCapacity(other.m_maxUsersCapacity),
     m_maxTransactionsCapacity(other.m_maxTransactionsCapacity),
-    // Создаем новые уникальные объекты для unique_ptr
+    // Создаем новые объекты для unique_ptr
     m_fineCalculator(std::make_unique<FineCalculator>(*other.m_fineCalculator)),
     m_searchEngine(std::make_unique<SearchEngine>(*other.m_searchEngine)),
     m_reportGenerator(std::make_unique<ReportGenerator>(*other.m_reportGenerator))
@@ -132,9 +132,8 @@ void Library::displayBooks() const
 
 Book* Library::findBookById(int BookID)
 {
-    // Ищем в векторе
     for (auto& book : m_books) { // Используем ссылку для возможности изменения
-        if (book.getBookID() == BookID) {
+        if (book.getItemId() == BookID) {
             return &book; // Возвращаем адрес объекта
         }
     }
@@ -161,15 +160,15 @@ void Library::displayUsers() const
     std::cout << "------------------------" << std::endl;
 }
 
-User* Library::findUserById(int UserID) // Параметр UserID переименован в userId для соответствия стилю
+User* Library::findUserById(int UserID)
 {
     // Проходим по вектору m_users
-    for (auto& user : m_users) { // Используем ссылку для возможности модификации, если нужно, или const& для чтения
+    for (auto& user : m_users) {
         if (user.getUserID() == UserID) {
-            return &user; // Возвращаем адрес объекта User, найденного в векторе
+            return &user; // Возвращаем адрес найденного объекта User
         }
     }
-    return nullptr; // Возвращаем nullptr, сигнализируя, что пользователь не найден
+    return nullptr; // Пользователь не найден
 }
 
 // --- Методы для работы с транзакциями ---
@@ -202,17 +201,16 @@ Transaction* Library::findTransactionById(int transactionId)
     return nullptr; // Транзакция не найдена
 }
 
-// Поиск последней активной (невозвращенной) транзакции для данной книги и пользователя
+// Поиск последней активной транзакции для данной книги и пользователя
 Transaction* Library::findTransactionByBookUser(int bookId, int userId)
 {
     Transaction* lastActiveTransaction = nullptr;
-    // Проходим по вектору транзакций
     for (auto& t : m_transactions) {
         if (t.getBookId() == bookId &&
             t.getUserId() == userId &&
             !t.isReturned())
         {
-            // Нашли невозвращенную транзакцию, сохраняем указатель
+            // Сохраняем указатель невозвращенной транзакции
             lastActiveTransaction = &t;
         }
     }
@@ -226,7 +224,7 @@ void Library::processLending(int BookID, int UserID)
     Book* book = findBookById(BookID);
     User* user = findUserById(UserID);
 
-    // Проверка на отсутствующие книгу или пользователя
+    // Проверка на отсутствие книги или пользователя
     if (!book) {
         std::cout << "Lending failed. Book with ID " << BookID << " not found." << std::endl;
         return;
@@ -243,7 +241,7 @@ void Library::processLending(int BookID, int UserID)
 
         // Создаем новую транзакцию
         std::tm issueDate = getCurrentTm();
-        std::tm dueDate = addDaysToTm(issueDate, 14); // Упрощенное добавление дней
+        std::tm dueDate = addDaysToTm(issueDate, 14);
 
         // Создаем транзакцию с уникальным ID
         Transaction newTransaction(static_cast<int>(m_transactions.size()) + 1, BookID, UserID, issueDate, dueDate);
@@ -274,7 +272,6 @@ void Library::processReturn(int BookID, int UserID)
         return;
     }
 
-    // Если дошли сюда, значит все условия выполнены
     std::tm returnDate = getCurrentTm();
     double fine = 0.0;
 

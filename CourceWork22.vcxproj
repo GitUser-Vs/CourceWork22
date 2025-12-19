@@ -140,8 +140,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Book.cpp" />
+    <ClCompile Include="DigitalBook.cpp" />
     <ClCompile Include="FineCalculator.cpp" />
     <ClCompile Include="Library.cpp" />
+    <ClCompile Include="LibraryItem.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="ReportGenerator.cpp" />
     <ClCompile Include="SearchEngine.cpp" />
@@ -150,8 +152,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Book.hpp" />
+    <ClInclude Include="DigitalBook.hpp" />
     <ClInclude Include="FineCalculator.hpp" />
     <ClInclude Include="Library.hpp" />
+    <ClInclude Include="LibraryItem.hpp" />
     <ClInclude Include="ReportGenerator.hpp" />
     <ClInclude Include="SearchEngine.hpp" />
     <ClInclude Include="Transaction.hpp" />
