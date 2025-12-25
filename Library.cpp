@@ -110,11 +110,16 @@ Library& Library::operator=(const Library& other)
 }
 
 // --- Methods for working with books ---
-void Library::addBook(const Book& book)
+void Library::addItemPtr(std::unique_ptr<LibraryItem> item) {
+    if (item) {
+        m_items.push_back(std::move(item));
+    }
+}
+
+void Library::addBook(const std::string& title, const std::string& author, int quantity) 
 {
-    // Для std::vector, push_back копирует объект
-    m_books.push_back(book);
-    std::cout << "Added book to library: '" << book.getTitle() << "'" << std::endl;
+    // Создаем новый объект
+    m_items.push_back(std::make_unique<Book>(m_nextId++, title, author, quantity));
 }
 
 void Library::displayBooks() const
@@ -130,16 +135,35 @@ void Library::displayBooks() const
     std::cout << "------------------------" << std::endl;
 }
 
-Book* Library::findBookById(int BookID)
-{
-    for (auto& book : m_books) { // Используем ссылку для возможности изменения
-        if (book.getItemId() == BookID) {
-            return &book; // Возвращаем адрес объекта
-        }
+LibraryItem* Library::findBookById(int itemId) {
+    auto it = std::find_if(m_items.begin(), m_items.end(),
+        [itemId](const std::unique_ptr<LibraryItem>& item) {
+            return item->getItemId() == itemId;
+        });
+
+    if (it != m_items.end()) {
+        return it->get();
     }
     return nullptr; // Книга не найдена
 }
 
+// Сортировка с использованием std::sort
+void Library::sortItemsByTitle() {
+    std::sort(m_items.begin(), m_items.end(),
+        [](const std::unique_ptr<LibraryItem>& a, const std::unique_ptr<LibraryItem>& b) {
+            // Сортируем по заголовку
+            return a->getTitle() < b->getTitle();
+        });
+}
+
+void Library::displayAllItems() const {
+    std::cout << "\n--- Library Contents ---\n";
+    for (const auto& itemPtr : m_items) {
+        // Вызов полиморфного метода displayInfo()
+        itemPtr->displayInfo();
+        std::cout << " | Qty: " << itemPtr->getQuantity() << "\n";
+    }
+}
 // --- Methods for working with users ---
 void Library::addUser(const User& user)
 {
@@ -221,7 +245,9 @@ Transaction* Library::findTransactionByBookUser(int bookId, int userId)
 void Library::processLending(int BookID, int UserID)
 {
     std::cout << "\nProcessing lending for Book ID " << BookID << " to User ID " << UserID << "..." << std::endl;
-    Book* book = findBookById(BookID);
+    LibraryItem* itemPtr = findBookById(BookID);
+    Book* book = dynamic_cast<Book*>(itemPtr);
+    //Book* book = findBookById(BookID);
     User* user = findUserById(UserID);
 
     // Проверка на отсутствие книги или пользователя
@@ -252,8 +278,9 @@ void Library::processLending(int BookID, int UserID)
 void Library::processReturn(int BookID, int UserID)
 {
     std::cout << "\nProcessing return for Book ID " << BookID << " by User ID " << UserID << "..." << std::endl;
-
-    Book* book = findBookById(BookID);
+    LibraryItem* itemPtr = findBookById(BookID);
+    Book* book = dynamic_cast<Book*>(itemPtr);
+    //Book* book = findBookById(BookID);
     User* user = findUserById(UserID);
 
     if (!book) {

@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <iostream>
+#include <algorithm> // Для sort/find_if
 #include "LibraryItem.hpp"
 
 class Book : public LibraryItem

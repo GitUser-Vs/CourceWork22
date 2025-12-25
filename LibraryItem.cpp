@@ -1,8 +1,6 @@
 #include "LibraryItem.hpp"
 #include <iomanip>
 
-LibraryItem::LibraryItem() : m_itemId(0), m_title("Unknown Item"), m_totalQuantity(0) {}
-
 LibraryItem::LibraryItem(int itemId, const std::string& title, int quantity)
     : m_itemId(itemId), m_title(title), m_totalQuantity(quantity) {}
 

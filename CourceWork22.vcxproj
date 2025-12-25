@@ -154,12 +154,14 @@
     <ClInclude Include="Book.hpp" />
     <ClInclude Include="DigitalBook.hpp" />
     <ClInclude Include="FineCalculator.hpp" />
+    <ClInclude Include="ItemProcessor.hpp" />
     <ClInclude Include="Library.hpp" />
     <ClInclude Include="LibraryItem.hpp" />
     <ClInclude Include="ReportGenerator.hpp" />
     <ClInclude Include="SearchEngine.hpp" />
     <ClInclude Include="Transaction.hpp" />
     <ClInclude Include="User.hpp" />
+    <ClInclude Include="Utils.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

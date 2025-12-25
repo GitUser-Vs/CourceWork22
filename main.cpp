@@ -6,6 +6,8 @@
 #include "ReportGenerator.hpp"
 #include "DigitalBook.hpp"
 #include "LibraryItem.hpp"
+#include "Utils.hpp"
+#include "ItemProcessor.hpp"
 #include <iostream>
 #include <vector>
 
@@ -61,10 +63,64 @@ void demonstrateVirtualFunctions() {
     demonstrateCloning(&physicalBook);
 }
 
+
+void demonstratePolymorphismAndAlgorithms(Library& lib) {
+    std::cout << "\n===== Demonstration of Polymorphism and Algorithms =====" << std::endl;
+
+    lib.addBook("Zen and the Art of C++", "Author X", 10);
+    lib.addBook("Effective STL", "Scott Meyers", 5);
+    lib.addItemPtr(std::make_unique<DigitalBook>(lib.findBookById(0) ? lib.findBookById(0)->getItemId() + 100 : 101,
+        "EBook Guide", "Linker L.", 7, "http://e.com", 500));
+
+    lib.displayAllItems();
+
+    // Алгоритм поиска
+    int searchId = lib.findBookById(2) ? lib.findBookById(2)->getItemId() : 0;
+    if (lib.findBookById(searchId)) {
+        std::cout << "\nFound item with ID " << searchId << ": " << lib.findBookById(searchId)->getTitle() << std::endl;
+    }
+
+    // Алгоритм сортировки
+    lib.sortItemsByTitle();
+    std::cout << "\n--- After Sorting by Title ---" << std::endl;
+    lib.displayAllItems();
+}
+
+void demonstrateTemplateUsage() {
+    std::cout << "\n===== Demonstration of Templates =====" << std::endl;
+
+    // --- Демонстрация Шаблонной Функции ---
+    std::vector<int> intData = { 10, 20, 30, 40 };
+    std::vector<double> doubleData = { 1.5, 2.5, 3.0 };
+
+    // Допустимые типы
+    std::cout << "Average of ints: " << calculateAverage(intData) << std::endl;
+    std::cout << "Average of doubles: " << calculateAverage(doubleData) << std::endl;
+
+    ItemProcessor<Book> bookProcessor;
+
+    // Создаем объекты Book
+    bookProcessor.addItem(std::make_unique<Book>(1001, "The Goblin", "Tolkien", 20));
+    bookProcessor.addItem(std::make_unique<Book>(1002, "Rendezvous", "Gaiman", 5));
+
+    bookProcessor.printAll();
+
+    // Демонстрация шаблонного метода
+    if (bookProcessor.findItemById<Book>(1001)) {
+        std::cout << "Processor found Book ID 1001." << std::endl;
+    }
+}
+
+
 // --- Main Function ---
 int main()
 {
     std::cout << "--- Library Management System Demonstration ---" << std::endl;
+    Library mainLibrary;
+    mainLibrary.addBook("C++ Primer", "Lippman", 3);
+
+    demonstratePolymorphismAndAlgorithms(mainLibrary);
+    demonstrateTemplateUsage();
 
     demonstrateVirtualFunctions();
 
@@ -97,29 +153,29 @@ int main()
     User user3(201, "Charlie Williams", "charlie.w@example.com", 3);
 
     // Adding books and users to the library (copying objects)
-    myLibrary->addBook(book2);
-    myLibrary->addBook(book3);
+    myLibrary->addBook(book2.getTitle(), book2.getAuthor(), book2.getQuantity());
+    myLibrary->addBook(book3.getTitle(), book3.getAuthor(), book3.getQuantity());
     myLibrary->addUser(user2);
     myLibrary->addUser(user3);
 
     myLibrary->addUser(userX);
-    myLibrary->addBook(bookA);
-    myLibrary->addBook(eBookB);
+    myLibrary->addBook(bookA.getTitle(), bookA.getAuthor(), bookA.getQuantity());
+    myLibrary->addItemPtr(std::make_unique<DigitalBook>(eBookB));
 
-    // Демонстрация работы с клонированием
-    Book* foundBook = myLibrary->findBookById(1);
-    if (foundBook) {
-        demonstrateCloning(foundBook);
-    }
+    LibraryItem* itemPtr = myLibrary->findBookById(1);
 
-    // Демонстрация доступа к protected полю через Book
-    if (foundBook) {
-        foundBook->checkProtectedAccess();
+    if (itemPtr) {
+        // Безопасное понижающее преобразование с использованием
+        Book* foundBook = dynamic_cast<Book*>(itemPtr);
+        if (foundBook) {
+            demonstrateCloning(foundBook); // Теперь можно вызвать
+            foundBook->checkProtectedAccess();
+        }
     }
 
     // Adding a book created dynamically (passing by value, memory is released after)
     Book* dynamicBookForLib = new Book(40, "The Great Gatsby", "F. Scott Fitzgerald", 8);
-    myLibrary->addBook(*dynamicBookForLib);
+    myLibrary->addBook(book2.getTitle(), book2.getAuthor(), book2.getQuantity());
     delete dynamicBookForLib;
 
     // Adding a user created dynamically (passed by value, memory is released after)

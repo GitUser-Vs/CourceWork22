@@ -4,6 +4,8 @@
 #include "SearchEngine.hpp"
 #include "ReportGenerator.hpp"
 #include "Transaction.hpp"
+#include "LibraryItem.hpp"
+#include "Book.hpp"
 #include <string>
 #include <iostream>
 #include <vector>
@@ -30,6 +32,10 @@ private:
     std::unique_ptr<SearchEngine> m_searchEngine;
     std::unique_ptr<ReportGenerator> m_reportGenerator;
 
+    // Контейнер для полиморфного хранения
+    std::vector<std::unique_ptr<LibraryItem>> m_items;
+    int m_nextId = 1;
+
 public:
     // constructors and destructor
     Library();
@@ -45,9 +51,20 @@ public:
     void displayLibraryInfo() const;
 
     // methods for working with books
-    void addBook(const Book& book);
+    void addBook(const std::string& title, const std::string& author, int quantity);
     void displayBooks() const;
-    Book* findBookById(int BookID);
+    //Book* findBookById(int BookID);
+
+    // Демонстрация поиска
+    LibraryItem* findBookById(int itemId);
+
+    // Демонстрация сортировки
+    void sortItemsByTitle();
+
+    void displayAllItems() const;
+
+    // Метод для добавления уже созданных объектов (для демонстрации шаблонов)
+    void addItemPtr(std::unique_ptr<LibraryItem> item);
 
     // methods for working with users
     void addUser(const User& user);

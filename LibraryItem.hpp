@@ -10,14 +10,14 @@ protected:
     int m_totalQuantity;
 
 public:
-    LibraryItem();
+    LibraryItem() : m_itemId(0), m_title("Unknown Item"), m_totalQuantity(0) {};
     LibraryItem(int itemId, const std::string& title, int quantity);
 
     // Виртуальный деструктор
     virtual ~LibraryItem() = default;
 
     // Виртуальная функция для отображения информации
-    virtual void displayInfo() const;
+    virtual void displayInfo() const = 0;
 
     virtual int getQuantity() const;
 
