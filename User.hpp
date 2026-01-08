@@ -9,40 +9,21 @@ class User
 
 private:
     // private variables
-    int m_userId;
-    std::string m_name;
-    std::string m_email;
-    std::vector<int> m_borrowedBookIds;
-    int m_maxBorrowedCount;
+    int userId;
+    std::string name;
+    std::string contact;
 
 public:
     // constructors and destructor
-    User();
-    User(int UserID, const std::string& name, const std::string& email, int maxBorrowedCount);
-    User(const User& other); // Copy Constructor
-    ~User() = default;
+    User(int id, std::string n, std::string c);
+    User(); //  онструктор по умолчанию
 
-    // Overloading the assignment operator by copying
-    User& operator=(const User& other);
+    int getId() const;
+    std::string getName() const;
+    std::string getContact() const;
 
-    // Friendly functions
-    friend std::ostream& operator<<(std::ostream& os, const User& user);
+    void display() const;
 
-    // public methods
-    void displayInfo() const;
-    bool borrowBook(int bookId);
-    bool returnBook(int bookId);
-
-    // Getters
-    int getUserID() const;
-    const std::string& getName() const;
-    const std::string& getEmail() const;
-    size_t getBorrowedCount() const;
-    int getMaxBorrowedCount() const;
-
-    // ѕерегрузка оператора дл€ сравнени€ пользователей по ID
-    bool operator==(const User& other) const;
+    std::string serialize() const;
+    void deserialize(const std::string& data);
 };
-
-// Friendly feature for the operator
-std::ostream& operator<<(std::ostream& os, const User& user);
