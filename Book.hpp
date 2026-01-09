@@ -1,48 +1,34 @@
 #pragma once
 #include <string>
 #include <iostream>
-#include <algorithm> // Для sort/find_if
-#include "LibraryItem.hpp"
 
-class Book : public LibraryItem
-{
+class Book {
 
-protected:
+private:
     // private variables
-    std::string m_author;
-    int m_available;
+    int bookId;
+    std::string title;
+    std::string author;
+    std::string isbn;
+    bool isAvailable;
+    friend class Library;
 
 public:
-    // constructors and destructor
+    // constructors
     Book();
-    Book(int BookID, const std::string& title, const std::string& author, int quantity);
-    // Конструктор копирования
-    Book(const Book& other);
-    ~Book() override = default;
-
-    // Оператор присваивания копированием
-    Book& operator=(const Book& other);
-
-    // Перегрузка присваивания
-    Book& operator=(const LibraryItem& other);
+    Book(int id, std::string t, std::string a, std::string i);
 
     // public methods
-    void displayInfo() const override;
-    // Перегрузка метода без вызова базового
-    void displayExtendedInfo() const;
-    void decreaseAvailable();
-    void increaseAvailable();
+    void display() const;
+    std::string serialize() const;
+    void deserialize(const std::string& data);
 
-    // Getters for accessing private fields
+    void setAvailability(bool status);
+
+    // Getters
+    int getId() const;
+    std::string getTitle() const;
     std::string getAuthor() const;
-    int getQuantity() const override;
-    int getAvailable() const;
-
-    // Реализация клонирования
-    LibraryItem* clone() const override;
-
-    // Демонстрация доступа к protected члену базового класса
-    void checkProtectedAccess() const;
+    std::string getIsbn() const;
+    bool getAvailability() const;
 };
-// Перегрузка оператора <<
-std::ostream& operator<<(std::ostream& os, const Book& book);

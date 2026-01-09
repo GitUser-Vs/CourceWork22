@@ -1,4 +1,10 @@
 #include "User.hpp"
+#include <string>
+#include <sstream>
+#include <vector>
+#include <iostream>
+
+using namespace std;
 
 // constructors and destructor
 User::User(int id, string n, string c) : userId(id), name(n), contact(c) {}
