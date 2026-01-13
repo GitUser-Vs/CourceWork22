@@ -1,105 +1,97 @@
 #include "Transaction.hpp"
 #include <iostream>
 #include <iomanip>
+#include <sstream>
+#include <vector>
+#include <ctime>
+#define _CRT_SECURE_NO_WARNINGS
+
+using namespace std;
+
+string Transaction::getCurrentDate() const {
+    time_t now = time(0);
+    tm t_local; // Используем локальную структуру
+
+    localtime_s(&t_local, &now);
+
+    stringstream ss;
+    ss << put_time(&t_local, "%Y-%m-%d");
+    return ss.str();
+}
 
 // Constructor
 Transaction::Transaction()
-    : m_transactionId(0), m_bookId(0), m_userId(0), m_isReturned(false), m_fineAmount(0.0)
+    : transactionId(0), bookId(0), userId(0), isActive(false)
 {
-    std::memset(&m_issueDate, 0, sizeof(std::tm));
-    std::memset(&m_dueDate, 0, sizeof(std::tm));
-    std::memset(&m_returnDate, 0, sizeof(std::tm));
 }
 
 // Constructor with parameters
-Transaction::Transaction(int transactionId, int bookId, int userId, const std::tm& issueDate, const std::tm& dueDate)
-    : m_transactionId(transactionId), m_bookId(bookId), m_userId(userId),
-    m_issueDate(issueDate), m_dueDate(dueDate),
-    m_isReturned(false), m_fineAmount(0.0)
+Transaction::Transaction(int Id, int bookId, int userId)
+    : transactionId(Id), bookId(bookId), userId(userId), isActive(true)
 {
-    std::memset(&m_returnDate, 0, sizeof(std::tm));
+    borrowDate = getCurrentDate();
+
+    // Срок возврата - 14 дней
+    time_t now = time(0);
+    now += 14 * 24 * 60 * 60;
+    tm t_due;
+
+    // Безопасное получение времени для dueDate
+    localtime_s(&t_due, &now);
+
+    stringstream ss;
+    ss << put_time(&t_due, "%Y-%m-%d");
+    dueDate = ss.str();
+
+    returnDate = "N/A";
 }
-
-// Copy constructor
-Transaction::Transaction(const Transaction& other)
-    : m_transactionId(other.m_transactionId),
-    m_bookId(other.m_bookId),
-    m_userId(other.m_userId),
-    m_issueDate(other.m_issueDate),
-    m_dueDate(other.m_dueDate),
-    m_returnDate(other.m_returnDate),
-    m_isReturned(other.m_isReturned),
-    m_fineAmount(other.m_fineAmount)
-{
-    
-}
-
-// --- Operator overload ---
-
-// Overloading the assignment operator by copying
-Transaction& Transaction::operator=(const Transaction& other)
-{
-    if (this != &other) // Checking for self-sealing
-    {
-        m_transactionId = other.m_transactionId;
-        m_bookId = other.m_bookId;
-        m_userId = other.m_userId;
-        m_issueDate = other.m_issueDate;
-        m_dueDate = other.m_dueDate;
-        m_returnDate = other.m_returnDate;
-        m_isReturned = other.m_isReturned;
-        m_fineAmount = other.m_fineAmount;
-    }
-    return *this;
-}
-
 
 // --- Public methods ---
-void Transaction::displayInfo() const
+void Transaction::display() const
 {
-    std::cout << *this << std::endl;
+    cout << "TID: " << transactionId << " | BookID: " << bookId
+        << " | UserID: " << userId << " | Выдана: " << borrowDate
+        << " | Срок: " << dueDate << " | Статус: "
+        << (isActive ? "Активна" : "Возвращена") << endl;
 }
 
-void Transaction::markAsReturned(const std::tm& returnDate, double fine)
+void Transaction::completeTransaction()
 {
-    m_returnDate = returnDate;
-    m_fineAmount = fine;
-    m_isReturned = true;
+    isActive = false;
+    returnDate = getCurrentDate();
 }
 
 // --- Getters ---
-int Transaction::getTransactionId() const { return m_transactionId; }
-int Transaction::getBookId() const { return m_bookId; }
-int Transaction::getUserId() const { return m_userId; }
-const std::tm& Transaction::getIssueDate() const { return m_issueDate; }
-const std::tm& Transaction::getDueDate() const { return m_dueDate; }
-const std::tm& Transaction::getReturnDate() const { return m_returnDate; }
-bool Transaction::isReturned() const { return m_isReturned; }
-double Transaction::getFineAmount() const { return m_fineAmount; }
+int Transaction::getTransactionId() const { return transactionId; }
+int Transaction::getBookId() const { return bookId; }
+int Transaction::getUserId() const { return userId; }
+//const std::tm& Transaction::getIssueDate() const { return m_issueDate; }
+//const std::tm& Transaction::getDueDate() const { return m_dueDate; }
+//const std::tm& Transaction::getReturnDate() const { return m_returnDate; }
+//bool Transaction::isReturned() const { return m_isReturned; }
+//double Transaction::getFineAmount() const { return m_fineAmount; }
+string Transaction::getDueDate() const { return dueDate; }
+bool Transaction::isActiveStatus() const { return isActive; }
 
-// --- Перегрузка оператора << ---
-std::ostream& operator<<(std::ostream& os, const Transaction& transaction)
-{
-    char issueBuf[100];
-    char dueBuf[100];
-    char returnBuf[100];
+string Transaction::serialize() const {
+    return to_string(transactionId) + "," + to_string(bookId) + "," + to_string(userId) + "," +
+        borrowDate + "," + dueDate + "," + returnDate + "," + (isActive ? "1" : "0");
+}
 
-    std::strftime(issueBuf, sizeof(issueBuf), "%Y-%m-%d", &transaction.m_issueDate);
-    std::strftime(dueBuf, sizeof(dueBuf), "%Y-%m-%d", &transaction.m_dueDate);
-
-    os << "Transaction(ID: " << transaction.m_transactionId
-        << ", BookID: " << transaction.m_bookId
-        << ", UserID: " << transaction.m_userId
-        << ", Issued: " << issueBuf
-        << ", Due: " << dueBuf;
-
-    if (transaction.m_isReturned) {
-        std::strftime(returnBuf, sizeof(returnBuf), "%Y-%m-%d", &transaction.m_returnDate);
-        os << ", Returned: " << returnBuf << ", Fine: $" << transaction.m_fineAmount;
+void Transaction::deserialize(const string& data) {
+    stringstream ss(data);
+    string segment;
+    vector<string> seglist;
+    while (getline(ss, segment, ',')) {
+        seglist.push_back(segment);
     }
-    else {
-        os << ", Status: Outstanding";
+    if (seglist.size() == 7) {
+        transactionId = stoi(seglist[0]);
+        bookId = stoi(seglist[1]);
+        userId = stoi(seglist[2]);
+        borrowDate = seglist[3];
+        dueDate = seglist[4];
+        returnDate = seglist[5];
+        isActive = (seglist[6] == "1");
     }
-    os << ")";
-    return os;
 }
