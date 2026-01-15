@@ -47,6 +47,14 @@ int main() {
         switch (choice) {
         case 1: lms.addBook(); break;
         case 2: lms.addUser(); break;
+        case 3: lms.updateBook(); break;
+        case 4: lms.borrowBook(); break;
+        case 5: lms.returnBook(); break;
+        case 6: lms.searchMenu(); break;
+        case 7: lms.generateReports(); break;
+        case 8: lms.displayAllBooks(); break;
+        case 9: lms.displayAllUsers(); break;
+        case 10: lms.displayAllTransactions(); break;
         case 0:
             // Деструктор Library будет вызван автоматически
             break;
