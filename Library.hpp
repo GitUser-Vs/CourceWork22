@@ -63,7 +63,7 @@ public:
     //Library(const std::string& name, const std::string& address,
     //    size_t maxBooks = 1000, size_t maxUsers = 500, size_t maxTransactions = 10000); // Добавлены параметры для вместимости
     //Library(const Library& other); // Конструктор копирования
-    ~Library() = default;
+    ~Library();
 
     // Перегрузка оператора присваивания копированием
     Library& operator=(const Library& other);
