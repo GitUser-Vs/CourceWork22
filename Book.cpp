@@ -48,5 +48,5 @@ void Book::deserialize(const string& data) {
         isbn = seglist[3];
         isAvailable = (seglist[4] == "1");
     }
-
+}
 
