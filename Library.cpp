@@ -87,10 +87,29 @@ void Library::loadTransactions() {
     ifs.close();
 }
 
+void Library::saveAccounts() {
+    ofstream ofs(ACCOUNT_FILE);
+    for (const auto& acc : accounts) { ofs << acc.serialize() << endl; }
+    ofs.close();
+}
+
+void Library::loadAccounts() {
+    ifstream ifs(ACCOUNT_FILE);
+    string line;
+    accounts.clear();
+    while (getline(ifs, line)) {
+        Account acc;
+        acc.deserialize(line);
+        accounts.push_back(acc);
+    }
+    ifs.close();
+}
+
 void Library::saveAllData() {
     saveBooks();
     saveUsers();
     saveTransactions();
+    saveAccounts();
     cout << "\n[СИСТЕМА] Данные сохранены." << endl;
 }
 
@@ -458,6 +477,56 @@ void Library::displayAllTransactions() const
 //    m_searchEngine->searchBooks(query);
 //    m_searchEngine->searchUsers(query); 
 //}
+
+// --- Аутентификация ---
+bool Library::registerUser() {
+    string username, password;
+    cout << "--- РЕГИСТРАЦИЯ (Роль по умолчанию: USER) ---" << endl;
+    cout << "Введите желаемый логин: "; getline(cin, username);
+
+    if (findAccount(username)) {
+        cout << "Ошибка: Логин уже занят." << endl;
+        return false;
+    }
+
+    cout << "Введите пароль: "; getline(cin, password);
+
+    // Сначала регистрируем нового пользователя в списке пользователей
+    users.emplace_back(nextUserId++, username, "N/A"); // Контакт изначально "N/A"
+    int newUserId = users.back().getId();
+
+    // Регистрируем аккаунт с ролью USER, связанный с новым ID
+    accounts.emplace_back(username, password, Role::USER, newUserId);
+
+    cout << "Регистрация успешна! Ваш User ID: " << newUserId << endl;
+    return true;
+}
+
+bool Library::login(std::string& currentUsername, Role& currentRole, int& currentUserId) {
+    string username, password;
+    cout << "--- ВХОД В СИСТЕМУ ---" << endl;
+    cout << "Логин: "; getline(cin, username);
+    cout << "Пароль: "; getline(cin, password);
+
+    Account* acc = findAccount(username);
+
+    if (!acc) {
+        cout << "Ошибка: Логин или пароль неверны." << endl;
+        return false;
+    }
+
+    if (acc->getPassword() == password) {
+        currentUsername = acc->getUsername();
+        currentRole = acc->getRole();
+        currentUserId = acc->getAssociatedId(); // User ID, если роль USER
+        cout << "Вход успешен. Роль: " << (currentRole == Role::ADMIN ? "АДМИНИСТРАТОР" : "ПОЛЬЗОВАТЕЛЬ") << endl;
+        return true;
+    }
+    else {
+        cout << "Ошибка: Логин или пароль неверны." << endl;
+        return false;
+    }
+}
 
 
 // --- Специализированные ---

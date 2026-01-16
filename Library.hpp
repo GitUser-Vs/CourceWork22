@@ -6,6 +6,7 @@
 #include "Transaction.hpp"
 #include "LibraryItem.hpp"
 #include "Book.hpp"
+#include "Account.hpp"
 #include <string>
 #include <iostream>
 #include <vector>
@@ -22,6 +23,7 @@ private:
     std::vector<Book> books;
     std::vector<User> users;
     std::vector<Transaction> transactions;
+    std::vector<Account> accounts;
 
     /*size_t m_maxBooksCapacity;
     size_t m_maxUsersCapacity;
@@ -39,6 +41,7 @@ private:
     const std::string BOOK_FILE = "books.txt";
     const std::string USER_FILE = "users.txt";
     const std::string TRANSACTION_FILE = "transactions.txt";
+    const std::string ACCOUNT_FILE = "accounts.txt";
 
     int nextBookId;
     int nextUserId;
@@ -47,14 +50,20 @@ private:
     // Приватные методы для I/O
     void saveBooks();
     void loadBooks();
+
     void saveUsers();
     void loadUsers();
+
     void saveTransactions();
     void loadTransactions();
+
+    void saveAccounts();
+    void loadAccounts();
 
     // Вспомогательные
     Book* findBook(int id);
     User* findUser(int id);
+    Account* findAccount(const std::string& username);
     //Transaction* findTransaction(int id);
 
 public:
@@ -66,7 +75,7 @@ public:
     ~Library();
 
     // Перегрузка оператора присваивания копированием
-    Library& operator=(const Library& other);
+    //Library& operator=(const Library& other);
 
     // public methods
     //void displayLibraryInfo() const;
@@ -85,6 +94,10 @@ public:
     void displayAllUsers() const;
     void displayAllTransactions() const;
     //Book* findBookById(int BookID);
+
+    // Методы аутентификации
+    bool registerUser();
+    bool login(std::string& currentUsername, Role& currentRole, int& currentUserId);
 
     void searchMenu();
     void generateReports() const;
