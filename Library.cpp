@@ -128,6 +128,13 @@ User* Library::findUser(int id) {
     return nullptr;
 }
 
+Account* Library::findAccount(const std::string& username) {
+    for (auto& acc : accounts) {
+        if (acc.getUsername() == username) return &acc;
+    }
+    return nullptr;
+}
+
 /*Transaction* Library::findTransaction(int id) {
     for (auto& t : transactions) {
         if (t.getId() == id) return &t;
