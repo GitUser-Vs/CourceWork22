@@ -34,9 +34,9 @@ private:
     FineCalculator fineCalculator;
 
     // Использование std::unique_ptr для управления агрегированными объектами
-    std::unique_ptr<FineCalculator> m_fineCalculator;
+    /*std::unique_ptr<FineCalculator> m_fineCalculator;
     std::unique_ptr<SearchEngine> m_searchEngine;
-    std::unique_ptr<ReportGenerator> m_reportGenerator;
+    std::unique_ptr<ReportGenerator> m_reportGenerator;*/
 
     const std::string BOOK_FILE = "books.txt";
     const std::string USER_FILE = "users.txt";
