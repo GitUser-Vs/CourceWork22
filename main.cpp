@@ -1,6 +1,7 @@
 ﻿#include "Library.hpp"
 #include <iostream>
 #include <vector>
+#include <Windows.h>
 
 using namespace std;
 
@@ -46,21 +47,18 @@ void displayUserMenu() {
     cout << "\n==============" << endl;
     cout << "БИБЛИОТЕКА (LMS)" << endl;
     cout << "================" << endl;
-    cout << "4. Выдать книгу" << endl;
-    cout << "5. Вернуть книгу" << endl;
-    cout << "ОТЧЕТЫ И ПОИСК:" << endl;
-    cout << "6. Поиск книг" << endl;
-    cout << "7. Сгенерировать отчеты" << endl;
-    cout << "ОБЩИЕ:" << endl;
-    cout << "8. Показать все книги" << endl;
-    cout << "9. Показать всех пользователей" << endl;
-    cout << "10. Показать историю транзакций" << endl;
+    cout << "1. Выдать книгу" << endl;
+    cout << "2. Вернуть книгу" << endl;
+    cout << "3. Поиск книг" << endl;
+    cout << "4. Показать все книги" << endl;
     cout << "0. Сохранить и Выход" << endl;
     cout << "-----------------------------------" << endl;
     cout << "Введите ваш выбор: ";
 }
 
 int main() {
+    SetConsoleCP(1251);
+    SetConsoleOutputCP(1251);
     setlocale(LC_ALL, "Russian");
 
     Library lms;
@@ -96,8 +94,9 @@ int main() {
     }
 
     if (loggedIn) {
+        cout << "\n--- Привет, " << activeUser << " ---" << endl;
         do {
-            cout << "\n--- Привет, " << activeUser << " ---" << endl;
+            
             if (activeRole == Role::ADMIN) {
                 displayMainMenu();
             }
@@ -125,7 +124,7 @@ int main() {
                 case 8: lms.displayAllBooks(); break;
                 case 9: lms.displayAllUsers(); break;
                 case 10: lms.displayAllTransactions(); break;
-                case 0: choice = -1;
+                case 0: /*choice = -1;*/
                     // Деструктор Library будет вызван автоматически
                     break;
                 default:
@@ -134,17 +133,15 @@ int main() {
             }
             else {
                 switch (choice) {
-                case 4: lms.borrowBook(); break;
-                case 5: lms.returnBook(); break;
-                case 6: lms.searchMenu(); break;
-                case 8: lms.displayAllBooks(); break;
-                case 9: cout << "Просмотр пользователей доступен только администратору." << endl; break;
-                case 10: cout << "История транзакций доступна только администратору." << endl; break;
-                case 0: choice = -1; break;
-                default: cout << "Для этой роли доступны только пункты 4, 5, 6, 8, 0." << endl;
+                case 1: lms.borrowBook(); break;
+                case 2: lms.returnBook(); break;
+                case 3: lms.searchMenu(); break;
+                case 4: lms.displayAllBooks(); break;
+                case 0: /*choice = -1;*/ break;
+                default: cout << "Неверный пункт меню." << endl;
                 }
             }
-        } while (choice != -1);
+        } while (choice != 0);
     }
     return 0;
 }

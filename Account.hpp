@@ -9,7 +9,7 @@ private:
     std::string username;
     std::string passwordHash;
     Role role;
-    int associatedId; // ID User или 0 для чистого админа
+    int associatedId;
 
 public:
     Account(std::string user, std::string pass, Role r, int id = 0);

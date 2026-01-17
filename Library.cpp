@@ -16,6 +16,7 @@ Library::Library() : nextBookId(1), nextUserId(1), nextTransactionId(1) {
     loadBooks();
     loadUsers();
     loadTransactions();
+    loadAccounts();
 }
 
 Library::~Library() {
