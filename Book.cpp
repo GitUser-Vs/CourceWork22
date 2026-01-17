@@ -29,7 +29,7 @@ void Book::display() const {
 void Book::setAvailability(bool status) { isAvailable = status; }
 
 string Book::serialize() const {
-    return to_string(bookId) + "," + title + "," + author + "," + isbn + "," + (isAvailable ? "1" : "0");
+    return to_string(bookId) + "," + title + "," + author + "," + isbn + "," + (isAvailable ? "1" : "0") + "," + file_path;
 }
 
 void Book::deserialize(const string& data) {
@@ -41,12 +41,13 @@ void Book::deserialize(const string& data) {
         seglist.push_back(segment);
     }
 
-    if (seglist.size() == 5) {
+    if (seglist.size() == 6) {
         bookId = stoi(seglist[0]);
         title = seglist[1];
         author = seglist[2];
         isbn = seglist[3];
         isAvailable = (seglist[4] == "1");
+        file_path = seglist[5]; // Читаем путь
     }
 }
 

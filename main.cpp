@@ -10,9 +10,9 @@ Role activeRole = Role::USER;
 int activeUserId = 0;
 
 void displayMainMenu() {
-    cout << "\n===================================" << endl;
+    cout << "\n====================================" << endl;
     cout << "СИСТЕМА УПРАВЛЕНИЯ БИБЛИОТЕКОЙ (LMS)" << endl;
-    cout << "===================================" << endl;
+    cout << "====================================" << endl;
     cout << "УПРАВЛЕНИЕ РЕСУРСАМИ:" << endl;
     cout << "1. Добавить книгу" << endl;
     cout << "2. Добавить пользователя" << endl;
@@ -27,6 +27,7 @@ void displayMainMenu() {
     cout << "8. Показать все книги" << endl;
     cout << "9. Показать всех пользователей" << endl;
     cout << "10. Показать историю транзакций" << endl;
+    cout << "11. Посмотреть и открыть выданные книги" << endl;
     cout << "0. Сохранить и Выход" << endl;
     cout << "-----------------------------------" << endl;
     cout << "Введите ваш выбор: ";
@@ -44,13 +45,14 @@ void displayAdminMenu() {
 }
 
 void displayUserMenu() {
-    cout << "\n==============" << endl;
+    cout << "\n================" << endl;
     cout << "БИБЛИОТЕКА (LMS)" << endl;
     cout << "================" << endl;
     cout << "1. Выдать книгу" << endl;
     cout << "2. Вернуть книгу" << endl;
     cout << "3. Поиск книг" << endl;
-    cout << "4. Показать все книги" << endl;
+    cout << "4. Показать все книги в библиотеке" << endl;
+    cout << "5. Посмотреть и открыть книги в моём распоряжении" << endl;
     cout << "0. Сохранить и Выход" << endl;
     cout << "-----------------------------------" << endl;
     cout << "Введите ваш выбор: ";
@@ -124,6 +126,7 @@ int main() {
                 case 8: lms.displayAllBooks(); break;
                 case 9: lms.displayAllUsers(); break;
                 case 10: lms.displayAllTransactions(); break;
+                case 11: lms.addBook(true); break;
                 case 0: /*choice = -1;*/
                     // Деструктор Library будет вызван автоматически
                     break;
@@ -137,6 +140,7 @@ int main() {
                 case 2: lms.returnBook(); break;
                 case 3: lms.searchMenu(); break;
                 case 4: lms.displayAllBooks(); break;
+                case 5: lms.viewMyBooks(activeUserId); break;
                 case 0: /*choice = -1;*/ break;
                 default: cout << "Неверный пункт меню." << endl;
                 }

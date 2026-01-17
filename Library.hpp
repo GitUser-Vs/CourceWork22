@@ -7,6 +7,7 @@
 #include "LibraryItem.hpp"
 #include "Book.hpp"
 #include "Account.hpp"
+#include "SystemHelper.hpp"
 #include <string>
 #include <iostream>
 #include <vector>
@@ -16,8 +17,6 @@ class Library
 
 private:
     // private variables
-    /*std::string m_name;
-    std::string m_address;*/
 
     // Использование std::vector для хранения объектов
     std::vector<Book> books;
@@ -25,18 +24,9 @@ private:
     std::vector<Transaction> transactions;
     std::vector<Account> accounts;
 
-    /*size_t m_maxBooksCapacity;
-    size_t m_maxUsersCapacity;
-    size_t m_maxTransactionsCapacity;*/
-
     SearchEngine searchEngine;
     ReportGenerator reportGenerator;
     FineCalculator fineCalculator;
-
-    // Использование std::unique_ptr для управления агрегированными объектами
-    /*std::unique_ptr<FineCalculator> m_fineCalculator;
-    std::unique_ptr<SearchEngine> m_searchEngine;
-    std::unique_ptr<ReportGenerator> m_reportGenerator;*/
 
     const std::string BOOK_FILE = "books.txt";
     const std::string USER_FILE = "users.txt";
@@ -69,19 +59,13 @@ private:
 public:
     // constructors and destructor
     Library();
-    //Library(const std::string& name, const std::string& address,
-    //    size_t maxBooks = 1000, size_t maxUsers = 500, size_t maxTransactions = 10000); // Добавлены параметры для вместимости
-    //Library(const Library& other); // Конструктор копирования
     ~Library();
 
-    // Перегрузка оператора присваивания копированием
-    //Library& operator=(const Library& other);
-
     // public methods
-    //void displayLibraryInfo() const;
     void saveAllData();
     
-    void addBook();
+    void addBook(bool is_digital = false);
+    void viewMyBooks(int userId) const; // Новая функция для пользователя
     void addUser();
     void updateBook();
 
@@ -101,25 +85,5 @@ public:
 
     void searchMenu();
     void generateReports() const;
-
-    //// Демонстрация поиска
-    //LibraryItem* findBookById(int itemId);
-
-    //// Демонстрация сортировки
-    //void sortItemsByTitle();
-
-    //void displayAllItems() const;
-
-    //// Методы для работы с транзакциями
-    //void addTransaction(const Transaction& transaction);
-    //void displayTransactions() const;
-    //Transaction* findTransactionById(int transactionId);
-    //Transaction* findTransactionByBookUser(int bookId, int userId);
-
-    //// methods using aggregated objects
-    //void processLending(int BookID, int UserID);
-    //void processReturn(int BookID, int UserID);
-    //void performSearch(const std::string& query);
-    //void generateLibraryReport();
 };
 

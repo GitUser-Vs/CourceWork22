@@ -10,6 +10,8 @@ private:
     std::string title;
     std::string author;
     std::string isbn;
+    std::string file_path; // Путь к цифровой копии
+
     bool isAvailable;
     friend class Library;
 
@@ -22,13 +24,16 @@ public:
     void display() const;
     std::string serialize() const;
     void deserialize(const std::string& data);
-
+    
+    // Сеттеры
     void setAvailability(bool status);
+    void setFilePath(const std::string& path) { file_path = path; }
 
     // Getters
     int getId() const;
     std::string getTitle() const;
     std::string getAuthor() const;
     std::string getIsbn() const;
+    std::string getFilePath() const { return file_path; }
     bool getAvailability() const;
 };

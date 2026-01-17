@@ -136,83 +136,85 @@ Account* Library::findAccount(const std::string& username) {
     return nullptr;
 }
 
-/*Transaction* Library::findTransaction(int id) {
-    for (auto& t : transactions) {
-        if (t.getId() == id) return &t;
-    }
-    return nullptr;
-}*/
-
-// Конструктор с параметрами
-//Library::Library(const std::string& name, const std::string& address, size_t maxBooks, size_t maxUsers, size_t maxTransactions)
-//    : m_name(name), m_address(address),
-//    m_maxBooksCapacity(maxBooks), m_maxUsersCapacity(maxUsers), m_maxTransactionsCapacity(maxTransactions),
-//    m_fineCalculator(std::make_unique<FineCalculator>(0.75)),
-//    m_searchEngine(std::make_unique<SearchEngine>()),
-//    m_reportGenerator(std::make_unique<ReportGenerator>())
-//{
-//}
-//
-//// Конструктор копирования
-//Library::Library(const Library& other)
-//    : m_name(other.m_name),
-//    m_address(other.m_address),
-//    m_books(other.m_books),
-//    m_users(other.m_users),
-//    m_transactions(other.m_transactions),
-//    m_maxBooksCapacity(other.m_maxBooksCapacity),
-//    m_maxUsersCapacity(other.m_maxUsersCapacity),
-//    m_maxTransactionsCapacity(other.m_maxTransactionsCapacity),
-//    // Создаем новые объекты для unique_ptr
-//    m_fineCalculator(std::make_unique<FineCalculator>(*other.m_fineCalculator)),
-//    m_searchEngine(std::make_unique<SearchEngine>(*other.m_searchEngine)),
-//    m_reportGenerator(std::make_unique<ReportGenerator>(*other.m_reportGenerator))
-//{
-//}
-
-// Перегрузка оператора присваивания копированием
-//Library& Library::operator=(const Library& other)
-//{
-//    if (this != &other) // Защита от самоприсваивания
-//    {
-//        m_name = other.m_name;
-//        m_address = other.m_address;
-//        m_books = other.m_books;
-//        m_users = other.m_users;
-//        m_transactions = other.m_transactions;
-//        m_maxBooksCapacity = other.m_maxBooksCapacity;
-//        m_maxUsersCapacity = other.m_maxUsersCapacity;
-//        m_maxTransactionsCapacity = other.m_maxTransactionsCapacity;
-//
-//        // Копируем агрегированные объекты, используя их конструкторы копирования
-//        *m_fineCalculator = *other.m_fineCalculator;
-//        *m_searchEngine = *other.m_searchEngine;
-//        *m_reportGenerator = *other.m_reportGenerator;
-//    }
-//    return *this;
-//}
-
-
-//void Library::addItemPtr(std::unique_ptr<LibraryItem> item) {
-//    if (item) {
-//        m_items.push_back(std::move(item));
-//    }
-//}
-
-
 // --- Операции ---
 
 // --- Methods for working with books ---
-void Library::addBook() 
+void Library::addBook(bool is_digital)
 {
     string title, author, isbn;
     cout << "Введите название: "; getline(cin, title);
     cout << "Введите автора: "; getline(cin, author);
     cout << "Введите ISBN: "; getline(cin, isbn);
 
+    string path = "N/A";
+    if (is_digital) {
+        cout << "Введите полный путь к файлу книги (например, C:\\books\\Name_book.pdf): ";
+        getline(cin, path);
+    }
+
     books.emplace_back(nextBookId++, title, author, isbn);
+    books.back().setFilePath(path); // Устанавливаем путь
     cout << "Книга добавлена с ID: " << books.back().getId() << endl;
 }
+
+
+// Новый метод для пользователя
+void Library::viewMyBooks(int userId) const {
+    cout << "\n--- МОИ ВЫДАННЫЕ КНИГИ ---" << endl;
+    bool found = false;
+
+    for (const auto& t : transactions) {
+        if (t.getUserId() == userId && t.isActiveStatus()) {
+            found = true;
+            const Book* book = nullptr;
+            for (const auto& b : books) {
+                if (b.getId() == t.getBookId()) {
+                    book = &b;
+                    break;
+                }
+            }
+
+            if (book) {
+                cout << "[" << book->getId() << "] " << book->getTitle()
+                    << " (Срок: " << t.getDueDate() << ")";
+
+                if (book->getFilePath() != "N/A") {
+                    cout << " [ЦЕНЗУРИРОВАНО - ДОСТУПНО ЧТЕНИЕ]";
+                }
+                cout << endl;
+            }
+        }
+    }
+    if (!found) {
+        cout << "У вас нет активных выданных книг." << endl;
+        return;
+    }
+
+    int choiceId;
+    cout << "\nВведите ID книги, которую хотите прочитать (или 0 для выхода): ";
+    cin >> choiceId;
+    cin.ignore();
+
+    if (choiceId != 0) {
+        const Book* targetBook = nullptr;
+        for (const auto& b : books) {
+            if (b.getId() == choiceId && b.getFilePath() != "N/A") {
+                targetBook = &b;
+                break;
+            }
+        }
+
+        if (targetBook) {
+            // Используем вспомогательный класс для открытия файла
+            SystemHelper::openFile(targetBook->getFilePath());
+        }
+        else {
+            cout << "Книга не найдена или цифровая копия недоступна." << endl;
+        }
+    }
+}
+
+
 
 void Library::displayAllBooks() const
 {
