@@ -139,6 +139,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Account.cpp" />
     <ClCompile Include="Book.cpp" />
     <ClCompile Include="DigitalBook.cpp" />
     <ClCompile Include="FineCalculator.cpp" />
@@ -151,6 +152,7 @@
     <ClCompile Include="User.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Account.hpp" />
     <ClInclude Include="Book.hpp" />
     <ClInclude Include="DigitalBook.hpp" />
     <ClInclude Include="FineCalculator.hpp" />
