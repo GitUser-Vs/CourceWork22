@@ -1,253 +1,324 @@
 import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.List; // Для использования List
+//import java.util.Comparator;
+//import java.util.HashMap;
+import java.util.List;
+import java.util.Optional;
+import java.util.Scanner;
 
 public class Library {
-    private String name;
-    private String address;
-
-    private ArrayList<Book> books;
-    private ArrayList<User> users;
-    private ArrayList<Transaction> transactions; // New list for transactions
-
-    private static int nextTransactionId = 1; // Статическое поле для уникальных ID транзакций
+	private List<Book> books = new ArrayList<>();
+    private List<User> users = new ArrayList<>();
+    private List<Transaction> transactions = new ArrayList<>();
+    private List<Account> accounts = new ArrayList<>();
     
-    // Aggregated objects
-    private FineCalculator fineCalculator;
-    private SearchEngine searchEngine;
-    private ReportGenerator reportGenerator;
+    private SearchEngine searchEngine = new SearchEngine();
+    private ReportGenerator reportGenerator = new ReportGenerator();
+    private FineCalculator fineCalculator = new FineCalculator();
+    
+    private Scanner scanner;
+    
+    private int nextBookId = 1;
+    private int nextUserId = 1;
+    private int nextTransactionId = 1;
 
-    // Constructors
+    private static final String BOOK_FILE = "books.txt";
+    private static final String USER_FILE = "users.txt";
+    private static final String TRANSACTION_FILE = "transactions.txt";
+    private static final String ACCOUNT_FILE = "accounts.txt";
+
+    // --- Session Management ---
+    private String activeUser = null;
+    private Role activeRole = null;
+    private int activeUserId = 0;
+
     public Library() {
-    	this("Unknown Library", "Unknown Address");
+    	this.scanner = new Scanner(System.in);
+        loadAllData();
+    }
+    
+    private <T extends Serializable> List<T> loadData(String filename) {
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(filename))) {
+            return (List<T>) ois.readObject();
+        } catch (FileNotFoundException e) {
+            System.out.println("Файл данных " + filename + " не найден. Начинаем с нуля.");
+            return new ArrayList<>();
+        } catch (IOException | ClassNotFoundException e) {
+            System.err.println("Ошибка при загрузке данных из " + filename + ": " + e.getMessage());
+            return new ArrayList<>();
+        }
     }
 
-    public Library(String name, String address) {
-        this.name = name;
-        this.address = address;
-        this.books = new ArrayList<>();
-        this.users = new ArrayList<>();
-        this.transactions = new ArrayList<>();
-
-        this.fineCalculator = new FineCalculator(0.75); // Example with the parameter
-        this.searchEngine = new SearchEngine();
-        this.reportGenerator = new ReportGenerator();
+    private void saveData(String filename, List<?> data) {
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(filename))) {
+            oos.writeObject(data);
+        } catch (IOException e) {
+            System.err.println("Ошибка при сохранении данных в " + filename + ": " + e.getMessage());
+        }
+    }
+    
+    private void loadAllData() {
+        this.books = loadData(BOOK_FILE);
+        this.users = loadData(USER_FILE);
+        this.transactions = loadData(TRANSACTION_FILE);
+        this.accounts = loadData(ACCOUNT_FILE);
+        
+        // Инициализация следующих ID (упрощено: берем max + 1)
+        // В реальной системе это должно быть надежнее
+        if (!books.isEmpty()) nextBookId = books.stream().mapToInt(Book::getId).max().getAsInt() + 1;
+        if (!users.isEmpty()) nextUserId = users.stream().mapToInt(User::getId).max().getAsInt() + 1;
+        if (!transactions.isEmpty()) nextTransactionId = transactions.stream().mapToInt(Transaction::getId).max().getAsInt() + 1;
     }
 
     // Public methods
-    public void displayLibraryInfo() {
-        System.out.println("Library Name: " + name +
-                           ", Address: " + address);
-        System.out.println("Current books: " + books.size());
-        System.out.println("Current users: " + users.size());
-        System.out.println("Current transactions: " + transactions.size());
-    }
+//    public void displayLibraryInfo() {
+//        System.out.println("Library Name: " + name +
+//                           ", Address: " + address);
+//        System.out.println("Current books: " + books.size());
+//        System.out.println("Current users: " + users.size());
+//        System.out.println("Current transactions: " + transactions.size());
+//    }
 
     // Methods for working with books
-    public void addBook(Book book) {
-    	try {
-            if (book == null) {
-                throw new IllegalArgumentException("Cannot add a null book to the library.");
-            }
-            // Проверка на дубликат по ID (требует equals/hashCode в Book)
-            for (Book existingBook : books) {
-                if (existingBook.equals(book)) {
-                    throw new IllegalArgumentException("Book with ID " + book.getBookId() + " already exists.");
-                }
-            }
-            books.add(book);
-            System.out.println("Added book to library: '" + book.getTitle() + "'");
-        } catch (IllegalArgumentException e) {
-            System.err.println("Error adding book: " + e.getMessage());
-        }
+ // --- Вспомогательные методы поиска ---
+    private Book findBook(int id) {
+        return books.stream().filter(b -> b.getId() == id).findFirst().orElse(null);
     }
-
-    public void displayBooks() {
-        System.out.println("\n--- Books in Library ---");
-        if (books.isEmpty()) {
-            System.out.println("No books in the library yet.");
-            return;
-        }
-        for (Book book : books) { // Using enhanced for loop
-            book.displayInfo();
-        }
-        System.out.println("------------------------");
+    private User findUser(int id) {
+        return users.stream().filter(u -> u.getId() == id).findFirst().orElse(null);
     }
-
-    public Book findBookById(int bookId) {
-        for (Book book : books) {
-            if (book.getBookId() == bookId) {
-                return book; // Returning the link to the object
-            }
-        }
-        return null; // The book was not found
+    private Account findAccount(String username) {
+        return accounts.stream().filter(a -> a.getUsername().equals(username)).findFirst().orElse(null);
     }
+    
+    // --- Аутентификация ---
 
-    // Methods for working with users
-    public void addUser(User user) {
-    	try {
-            if (user == null) {
-                throw new IllegalArgumentException("Cannot add a null user to the library.");
-            }
-             for (User existingUser : users) {
-                if (existingUser.equals(user)) {
-                    throw new IllegalArgumentException("User with ID " + user.getUserId() + " already exists.");
-                }
-            }
-            users.add(user);
-            System.out.println("Added user to library: '" + user.getName() + "'");
-        } catch (IllegalArgumentException e) {
-            System.err.println("Error adding user: " + e.getMessage());
-        }
-    }
-
-    public void displayUsers() {
-        System.out.println("\n--- Users in Library ---");
-        if (users.isEmpty()) {
-            System.out.println("No users in the library yet.");
-            return;
-        }
-        for (User user : users) {
-            user.displayInfo();
-        }
-        System.out.println("------------------------");
-    }
-
-    public User findUserById(int userId) {
-        for (User user : users) {
-            if (user.getUserId() == userId) {
-                return user; // Returning the link to the object
-            }
-        }
-        return null; // The user is not found
-    }
-
-    // Methods for working with transactions
-    //private int nextTransactionId = 1; // A simple ID generator for transactions
-
-    public void addTransaction(Transaction transaction) {
-        transactions.add(transaction); // Adding a link to the object
-        System.out.println("Added transaction to library system.");
-    }
-
-    public void displayTransactions() {
-        System.out.println("\n--- Transactions in Library ---");
-        if (transactions.isEmpty()) {
-            System.out.println("No transactions recorded yet.");
-            return;
-        }
-        for (Transaction transaction : transactions) {
-            transaction.displayInfo();
-        }
-        System.out.println("-------------------------------");
-    }
-
-    // Search for the last active transaction for a given workbook and user
-    public Transaction findActiveTransactionByBookUser(int bookId, int userId) {
-        Transaction lastActiveTransaction = null;
-        for (Transaction transaction : transactions) {
-            if (transaction.getBookId() == bookId &&
-                transaction.getUserId() == userId &&
-                !transaction.isReturned()) {
-                // If we find an unreturned transaction, we save the link
-                lastActiveTransaction = transaction;
-            }
-        }
-        return lastActiveTransaction; // Returns null if nothing is found.
-    }
-
-    public void processLending(int bookId, int userId) {
-        System.out.println("\nProcessing lending for Book ID " + bookId + " to User ID " + userId + "...");
-        Book book = findBookById(bookId);
-        User user = findUserById(userId);
+    public boolean registerUser() {
+        System.out.println("--- РЕГИСТРАЦИЯ (Роль по умолчанию: USER) ---");
+        System.out.print("Введите желаемый логин: "); 
+        String username = scanner.nextLine();
         
-        if (book == null) {
-            System.out.println("Lending failed. Book with ID " + bookId + " not found.");
-            return;
+        if (findAccount(username) != null) {
+            System.out.println("Ошибка: Логин уже занят.");
+            return false;
         }
 
-        if (user == null) {
-            System.out.println("Lending failed. User with ID " + userId + " not found.");
-            return;
+        System.out.print("Введите пароль: "); 
+        String password = scanner.nextLine();
+
+        users.add(new User(nextUserId++, username, "N/A"));
+        int newUserId = users.get(users.size() - 1).getId();
+
+        accounts.add(new Account(username, password, Role.USER, newUserId));
+        
+        System.out.println("Регистрация успешна! Ваш User ID: " + newUserId);
+        return true;
+    }
+    
+    public boolean login(String username, String password) {
+        Account acc = findAccount(username);
+
+        if (acc == null || !acc.getPassword().equals(password)) {
+            System.out.println("Ошибка: Логин или пароль неверны.");
+            return false;
         }
 
-        if (user.borrowBook()) {
-            book.decreaseAvailable();
-            System.out.println("Lending successful. Book '" + book.getTitle() + "' lent to '" + user.getName() + "'.");
+        this.activeUser = acc.getUsername();
+        this.activeRole = acc.getRole();
+        this.activeUserId = acc.getAssociatedId();
+        
+        System.out.println("Вход успешен. Роль: " + this.activeRole);
+        return true;
+    }
+    
+    // Геттеры для сессии
+    public Role getActiveRole() { return activeRole; }
+    public String getActiveUser() { return activeUser; }
+    public int getActiveUserId() { return activeUserId; }
 
-            // Creating a new transaction for this issue
-            LocalDate issueDate = LocalDate.now();
-            LocalDate dueDate = issueDate.plusDays(14);
+    // --- CRUD / Операции ---
 
-            Transaction newTransaction = new Transaction(nextTransactionId++, bookId, userId, issueDate, dueDate);
-            addTransaction(newTransaction);
-        } else {
-            System.out.println("Lending failed. User '" + user.getName() + "' has reached maximum borrowed books.");
+    public void addBook(boolean isDigital) {
+    	System.out.println("\n--- ДОБАВЛЕНИЕ НОВОЙ КНИГИ ---");
+        System.out.print("Введите название: "); String title = scanner.nextLine();
+        System.out.print("Введите автора: "); String author = scanner.nextLine();
+        System.out.print("Введите ISBN: "); String isbn = scanner.nextLine();
+        
+        String path = "N/A";
+        if (isDigital) {
+            System.out.print("Введите полный путь к файлу книги (например, C:\\\\eBooks\\\\book.pdf): "); 
+            path = scanner.nextLine();
+        }
+
+        books.add(new Book(nextBookId++, title, author, isbn, path));
+        System.out.println("Книга добавлена с ID: " + books.get(books.size() - 1).getId());
+    }
+    
+    public void addUser() {
+        System.out.println("\n--- ДОБАВЛЕНИЕ НОВОГО ПОЛЬЗОВАТЕЛЯ ---");
+        System.out.print("Введите имя пользователя: ");
+        String name = scanner.nextLine();
+        
+        // Контакт задается вручную или "N/A"
+        System.out.print("Введите контактную информацию (email/телефон, или Enter для пропуска): ");
+        String contact = scanner.nextLine();
+        if (contact.trim().isEmpty()) {
+            contact = "N/A";
+        }
+
+        users.add(new User(nextUserId++, name, contact));
+        System.out.println("Пользователь успешно добавлен. User ID: " + users.get(users.size() - 1).getId());
+    }
+    
+    public void updateBook() {
+        System.out.println("\n--- ОБНОВЛЕНИЕ ИНФОРМАЦИИ О КНИГЕ ---");
+        System.out.print("Введите ID книги для обновления: ");
+        
+        try {
+            int id = scanner.nextInt();
+            scanner.nextLine(); // Consume newline
+
+            Book bookToUpdate = findBook(id);
+            if (bookToUpdate == null) {
+                System.out.println("Ошибка: Книга с ID " + id + " не найдена.");
+                return;
+            }
+
+            System.out.println("Текущее название: " + bookToUpdate.getTitle());
+            System.out.print("Новое название (Enter для пропуска): "); 
+            String newTitle = scanner.nextLine();
+            if (!newTitle.isEmpty()) {
+                System.out.println("Название обновлено.");
+            }
+            
+            System.out.println("Текущий автор: " + bookToUpdate.getAuthor());
+            System.out.print("Новый автор (Enter для пропуска): "); 
+            String newAuthor = scanner.nextLine();
+            if (!newAuthor.isEmpty()) {
+                // bookToUpdate.setAuthor(newAuthor);
+                System.out.println("Автор обновлен.");
+            }
+            
+            System.out.println("Текущий ISBN: " + bookToUpdate.getIsbn());
+            System.out.print("Новый ISBN (Enter для пропуска): "); 
+            String newIsbn = scanner.nextLine();
+            if (!newIsbn.isEmpty()) {
+                // bookToUpdate.setIsbn(newIsbn);
+                System.out.println("ISBN обновлен.");
+            }
+
+            System.out.println("Информация о книге ID " + id + " обновлена.");
+
+        } catch (Exception e) {
+            System.out.println("Некорректный ввод ID.");
+            scanner.nextLine();
         }
     }
+    
+    public void borrowBook() {
+        System.out.print("Введите ID пользователя: "); int uId = scanner.nextInt(); scanner.nextLine();
+        System.out.print("Введите ID книги для выдачи: "); int bId = scanner.nextInt(); scanner.nextLine();
+        
+        User user = findUser(uId);
+        Book book = findBook(bId);
 
-    public void processReturn(int bookId, int userId) {
-        System.out.println("\nProcessing return for Book ID " + bookId + " by User ID " + userId + "...");
-        Book book = findBookById(bookId);
-        User user = findUserById(userId);
+        if (user == null) { System.out.println("Ошибка: Пользователь не найден."); return; }
+        if (book == null || !book.getAvailable()) { System.out.println("Ошибка: Книга не найдена или выдана."); return; }
 
-        if (book == null) {
-            System.out.println("Return failed. Book with ID " + bookId + " not found.");
-            return;
-        }
+        transactions.add(new Transaction(nextTransactionId++, bId, uId));
+        book.setAvailability(false);
+        System.out.println("Книга '" + book.getTitle() + "' выдана.");
+    }
 
-        if (user == null) {
-            System.out.println("Return failed. User with ID " + userId + " not found.");
-            return;
-        }
+    public void returnBook() {
+        System.out.print("Введите ID книги, которую возвращают: "); int bId = scanner.nextInt(); scanner.nextLine();
 
-        Transaction activeTransaction = findActiveTransactionByBookUser(bookId, userId);
+        Book book = findBook(bId);
+        if (book == null) { System.out.println("Ошибка: Книга не найдена."); return; }
+        
+        Transaction activeT = transactions.stream()
+            .filter(t -> t.getBookId() == bId && t.isActiveStatus())
+            .findFirst().orElse(null);
 
-        if (activeTransaction == null) {
-            System.out.println("Return failed. No active lending transaction found for Book ID " + bookId + " and User ID " + userId + ".");
-            return;
-        }
+        if (activeT == null) { System.out.println("Ошибка: Активная запись о выдаче не найдена."); return; }
 
-        LocalDate returnDate = LocalDate.now();
-        // Используем FineCalculator для расчета штрафа
-        double fine = fineCalculator.calculateFine(activeTransaction.getDueDate(), returnDate);
-
-        activeTransaction.markAsReturned(returnDate, fine);
-        book.increaseAvailable();
-        System.out.println("Return successful. Book '" + book.getTitle() + "' returned by '" + user.getName() + "'.");
+        book.setAvailability(true);
+        activeT.completeTransaction();
+        
+        double fine = fineCalculator.calculateFine(activeT);
+        System.out.println("Книга '" + book.getTitle() + "' успешно возвращена.");
         if (fine > 0) {
-            System.out.println("  Fine incurred: $" + String.format("%.2f", fine));
+            System.out.println("!!! Начислен штраф: " + fine + " у.е. за просрочку.");
         }
-        user.returnBook(); // Может бросить исключение, если нечего возвращать
     }
 
- // Используем SearchEngine более эффективно
-    public List<Book> searchBooks(String query) {
-        System.out.println("\nPerforming book search in Library...");
-        return searchEngine.searchBooksByTitle(this.books, query); // Передаем весь список книг
-    }
+    public void viewMyBooks() {
+        System.out.println("\n--- МОИ ВЫДАННЫЕ КНИГИ ---");
+        boolean found = false;
+        
+        for (Transaction t : transactions) {
+            if (t.getUserId() == activeUserId && t.isActiveStatus()) {
+                found = true;
+                Book book = findBook(t.getBookId());
+                
+                if (book != null) {
+                    System.out.print("[" + book.getId() + "] " + book.getTitle() 
+                         + " (Срок: " + t.getDueDate() + ")");
+                    
+                    if (!book.getFilePath().equals("N/A")) {
+                        System.out.print(" [ДОСТУПНО ЧТЕНИЕ]");
+                    }
+                    System.out.println();
+                }
+            }
+        }
+        if (!found) {
+            System.out.println("У вас нет активных выданных книг.");
+            return;
+        }
 
-    public List<User> searchUsers(String query) {
-        System.out.println("\nPerforming user search in Library...");
-        return searchEngine.searchUsersByName(this.users, query); // Передаем весь список пользователей
-    }
+        System.out.print("\nВведите ID книги, которую хотите прочитать (или 0 для выхода): "); 
+        int choiceId = scanner.nextInt(); scanner.nextLine();
 
-    // Используем ReportGenerator для генерации конкретных отчетов
-    public void generateBookReport() {
-        reportGenerator.generateBookReport(this.books);
+        if (choiceId != 0) {
+            Book targetBook = findBook(choiceId);
+            if (targetBook != null && !targetBook.getFilePath().equals("N/A")) {
+                // Эмуляция открытия файла
+                SystemHelper.openFile(targetBook.getFilePath());
+            } else {
+                System.out.println("Книга не найдена или цифровая копия недоступна.");
+            }
+        }
     }
-
-    public void generateUserReport() {
-        reportGenerator.generateUserReport(this.users);
+    
+    public void displayAllBooks() {
+        System.out.println("\n--- СПИСОК ВСЕХ КНИГ ---");
+        if (books.isEmpty()) {
+            System.out.println("В библиотеке нет книг.");
+            return;
+        }
+        books.forEach(Book::display);
     }
-
-    public void generateTransactionReport() {
-        reportGenerator.generateTransactionReport(this.transactions);
+    
+    public void displayAllUsers() {
+        System.out.println("\n--- СПИСОК ВСЕХ ПОЛЬЗОВАТЕЛЕЙ ---");
+        if (users.isEmpty()) {
+            System.out.println("Пользователи не зарегистрированы.");
+            return;
+        }
+        users.forEach(User::display);
     }
-
-    // Общий отчет (как демонстрация)
-    public void generateGeneralReport(String reportType) {
-        reportGenerator.generateGeneralReport(reportType);
+    
+    public void displayAllTransactions() {
+        System.out.println("\n--- ВСЕ ТРАНЗАКЦИИ ---");
+        if (transactions.isEmpty()) {
+            System.out.println("Транзакции отсутствуют.");
+            return;
+        }
+        transactions.forEach(Transaction::displayInfo);
     }
 }
