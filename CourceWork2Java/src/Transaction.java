@@ -1,62 +1,76 @@
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.io.Serializable;
+import java.time.temporal.ChronoUnit;
 
-public class Transaction {
+public class Transaction implements Serializable{
+	private static final long serialVersionUID = 1L;
+	
     private int transactionId;
     private int bookId; // Storing the Book ID
     private int userId; // Storing the User ID
-    private LocalDate issueDate;
-    private LocalDate dueDate;
-    private LocalDate returnDate; // It can be null if the book has not been returned yet.
-    private boolean isReturned;
-    private double fineAmount; // Fine if it was accrued
+    private String borrowDate;
+    private String dueDate;
+    private String returnDate; // It can be null if the book has not been returned yet.
+    private boolean isActive;
+    //private double fineAmount; // Fine if it was accrued
 
     // Formatter for date output
-    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     // Constructors
-    public Transaction() {
+    public Transaction(int id, int bId, int uId) {
+    	LocalDate today = LocalDate.now();
+    	
         this.transactionId = 0;
-        this.bookId = 0;
-        this.userId = 0;
-        this.issueDate = LocalDate.now(); // By default, the current date is
-        this.dueDate = this.issueDate.plusDays(14); // By default, +14 days
-        this.returnDate = null;
-        this.isReturned = false;
-        this.fineAmount = 0.0;
+        this.bookId = bId;
+        this.userId = uId;
+        this.borrowDate = today.format(FORMATTER); // By default, the current date is     
+        this.dueDate = today.plus(14, ChronoUnit.DAYS).format(FORMATTER);
+        this.returnDate = "N/A";
+        this.isActive = true;
+        //this.fineAmount = 0.0;
     }
 
-    public Transaction(int transactionId, int bookId, int userId, LocalDate issueDate, LocalDate dueDate) {
-        this.transactionId = transactionId;
-        this.bookId = bookId;
-        this.userId = userId;
-        this.issueDate = issueDate;
-        this.dueDate = dueDate;
-        this.returnDate = null;
-        this.isReturned = false;
-        this.fineAmount = 0.0;
+    public Transaction() {
+    	this.isActive = false;
+    	
+//        this.transactionId = transactionId;
+//        this.bookId = bookId;
+//        this.userId = userId;
+//        this.issueDate = issueDate;
+//        this.dueDate = dueDate;
+//        this.returnDate = null;
+//        this.isReturned = false;
+//        this.fineAmount = 0.0;
     }
 
     // Public methods
     public void displayInfo() {
-    	String status = isReturned ? "Returned" : "Active";
-        System.out.printf("  TID: %d | BookID: %d | UserID: %d | Due: %s | Status: %s | Fine: $%.2f%n",
-                          transactionId, bookId, userId, dueDate, status, fineAmount);
+    	System.out.println("TID: " + transactionId + " | BookID: " + bookId 
+                + " | UserID: " + userId + " | Выдана: " + borrowDate
+                + " | Срок: " + dueDate + " | Статус: " 
+                + (isActive ? "Активна" : "Возвращена"));
     }
 
-    public void markAsReturned(LocalDate returnDate, double fine) {
-        this.returnDate = returnDate;
-        this.fineAmount = fine;
-        this.isReturned = true;
+//    public void markAsReturned(LocalDate returnDate, double fine) {
+//        this.returnDate = returnDate;
+//        this.fineAmount = fine;
+//        this.isReturned = true;
+//    }
+    
+    public void completeTransaction() {
+        this.isActive = false;
+        this.returnDate = LocalDate.now().format(FORMATTER);
     }
 
     // Getters
-    public int getTransactionId() { return transactionId; }
+    public int getId() { return transactionId; }
     public int getBookId() { return bookId; }
     public int getUserId() { return userId; }
-    public LocalDate getIssueDate() { return issueDate; }
-    public LocalDate getDueDate() { return dueDate; }
-    public LocalDate getReturnDate() { return returnDate; }
-    public boolean isReturned() { return isReturned; }
-    public double getFineAmount() { return fineAmount; }
+    //public LocalDate getIssueDate() { return issueDate; }
+    public String getDueDate() { return dueDate; }
+    //public LocalDate getReturnDate() { return returnDate; }
+    public boolean isActiveStatus() { return isActive; }
+    //public double getFineAmount() { return fineAmount; }
 }
