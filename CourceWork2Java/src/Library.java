@@ -73,6 +73,14 @@ public class Library {
         if (!users.isEmpty()) nextUserId = users.stream().mapToInt(User::getId).max().getAsInt() + 1;
         if (!transactions.isEmpty()) nextTransactionId = transactions.stream().mapToInt(Transaction::getId).max().getAsInt() + 1;
     }
+    
+    public void saveAllData() {
+        saveData(BOOK_FILE, books);
+        saveData(USER_FILE, users);
+        saveData(TRANSACTION_FILE, transactions);
+        saveData(ACCOUNT_FILE, accounts);
+        System.out.println("\n[СИСТЕМА] Данные сохранены.");
+    }
 
     // Public methods
 //    public void displayLibraryInfo() {
@@ -320,5 +328,97 @@ public class Library {
             return;
         }
         transactions.forEach(Transaction::displayInfo);
+    }
+    
+    public void searchMenu() {
+        System.out.println("\n--- МЕНЮ ПОИСКА ---");
+        System.out.println("1. Поиск по названию");
+        System.out.println("2. Поиск по автору");
+        System.out.print("Ваш выбор: ");
+        
+        try {
+            int choice = scanner.nextInt();
+            scanner.nextLine(); // Consume newline
+            
+            System.out.print("Введите поисковый запрос: ");
+            String query = scanner.nextLine();
+            
+            List<Book> results = new ArrayList<>();
+
+            switch (choice) {
+                case 1:
+                    results = searchEngine.searchByTitle(books, query);
+                    break;
+                case 2:
+                    results = searchEngine.searchByAuthor(books, query);
+                    break;
+                default:
+                    System.out.println("Неверный выбор.");
+                    return;
+            }
+            
+            System.out.println("\n--- РЕЗУЛЬТАТЫ ПОИСКА (" + results.size() + ") ---");
+            if (results.isEmpty()) {
+                System.out.println("Ничего не найдено.");
+            } else {
+                results.forEach(Book::display);
+            }
+
+        } catch (Exception e) {
+            System.out.println("Некорректный ввод.");
+            scanner.nextLine(); 
+        }
+    }
+    
+    public void generateReports() {
+        System.out.println("\n--- ГЕНЕРАЦИЯ ОТЧЕТОВ ---");
+        System.out.println("1. Отчет об активных выдачах");
+        System.out.println("2. Отчет о штрафах (по активным выданным)");
+        System.out.print("Ваш выбор: ");
+
+        try {
+            int choice = scanner.nextInt();
+            scanner.nextLine(); 
+
+            switch (choice) {
+                case 1:
+                    reportGenerator.generateActiveLoansReport(transactions, users, books);
+                    break;
+                case 2:
+                    generateFineReport();
+                    break;
+                default:
+                    System.out.println("Неверный выбор.");
+            }
+        } catch (Exception e) {
+            System.out.println("Некорректный ввод.");
+            scanner.nextLine(); 
+        }
+    }
+
+    private void generateFineReport() {
+        System.out.println("\n--- ОТЧЕТ О ШТРАФАХ ---");
+        boolean foundFine = false;
+        
+        for (Transaction t : transactions) {
+            if (t.isActiveStatus()) {
+                double fine = fineCalculator.calculateFine(t);
+                if (fine > 0) {
+                    foundFine = true;
+                    
+                    User u = findUser(t.getUserId());
+                    Book b = findBook(t.getBookId());
+                    
+                    String userName = (u != null) ? u.getName() : "ID " + t.getUserId() + " (Не найден)";
+                    String bookTitle = (b != null) ? b.getTitle() : "ID " + t.getBookId() + " (Не найден)";
+                    
+                    System.out.printf("Пользователь: %s | Книга: %s | Штраф: %.2f\n", userName, bookTitle, fine);
+                }
+            }
+        }
+        
+        if (!foundFine) {
+            System.out.println("На данный момент штрафов нет.");
+        }
     }
 }
