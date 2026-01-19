@@ -60,14 +60,13 @@ public class Main {
             System.out.println("Некорректный ввод.");
             scanner.nextLine(); // Очистка буфера
         }
-        System.out.println("\n===================================");
-        System.out.println("Привет, " + activeUser + " (" + activeRole + ")");
-        System.out.println("===================================");
+        
     }
     
     private static void mainMenu() {
-        
-        
+    	System.out.println("\n===================================");
+        System.out.println("Привет, " + activeUser + " (" + activeRole + ")");
+        System.out.println("===================================");
         // Если роль АДМИН
         if (activeRole == Role.ADMIN) {
         	System.out.println("--- МЕНЮ ДЕЙСТВИЙ ---");
