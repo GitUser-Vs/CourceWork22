@@ -240,7 +240,17 @@ void Library::updateBook() {
     cout << "Новый ISBN (Enter для пропуска): "; getline(cin, newIsbn);
     if (!newIsbn.empty()) book->isbn = newIsbn;
 
-    cout << "Книга обновлена." << endl;
+    cout << "Текущий путь к файлу: " << book->getFilePath() << endl;
+    cout << "Новый путь к файлу (Enter для пропуска): ";
+    string newPath;
+    getline(cin, newPath);
+
+    if (!newPath.empty()) {
+        book->setFilePath(newPath);
+        cout << "Путь к файлу успешно обновлен." << endl;
+    }
+
+    cout << "Данные книги успешно обновлены." << endl;
 }
 
 void Library::borrowBook() {
