@@ -4,8 +4,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-//import java.util.Comparator;
-//import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
@@ -67,8 +65,7 @@ public class Library {
         this.transactions = loadData(TRANSACTION_FILE);
         this.accounts = loadData(ACCOUNT_FILE);
         
-        // Инициализация следующих ID (упрощено: берем max + 1)
-        // В реальной системе это должно быть надежнее
+        // Initialization of the following IDs
         if (!books.isEmpty()) nextBookId = books.stream().mapToInt(Book::getId).max().getAsInt() + 1;
         if (!users.isEmpty()) nextUserId = users.stream().mapToInt(User::getId).max().getAsInt() + 1;
         if (!transactions.isEmpty()) nextTransactionId = transactions.stream().mapToInt(Transaction::getId).max().getAsInt() + 1;
@@ -82,17 +79,7 @@ public class Library {
         System.out.println("\n[СИСТЕМА] Данные сохранены.");
     }
 
-    // Public methods
-//    public void displayLibraryInfo() {
-//        System.out.println("Library Name: " + name +
-//                           ", Address: " + address);
-//        System.out.println("Current books: " + books.size());
-//        System.out.println("Current users: " + users.size());
-//        System.out.println("Current transactions: " + transactions.size());
-//    }
-
-    // Methods for working with books
- // --- Вспомогательные методы поиска ---
+ // --- Auxiliary search methods ---
     private Book findBook(int id) {
         return books.stream().filter(b -> b.getId() == id).findFirst().orElse(null);
     }
@@ -103,7 +90,7 @@ public class Library {
         return accounts.stream().filter(a -> a.getUsername().equals(username)).findFirst().orElse(null);
     }
     
-    // --- Аутентификация ---
+    // --- Authentication ---
 
     public boolean registerUser() {
         System.out.println("--- РЕГИСТРАЦИЯ (Роль по умолчанию: USER) ---");
@@ -143,12 +130,12 @@ public class Library {
         return true;
     }
     
-    // Геттеры для сессии
+    // Getters
     public Role getActiveRole() { return activeRole; }
     public String getActiveUser() { return activeUser; }
     public int getActiveUserId() { return activeUserId; }
 
-    // --- CRUD / Операции ---
+    // --- Operations ---
 
     public void addBook(boolean isDigital) {
     	System.out.println("\n--- ДОБАВЛЕНИЕ НОВОЙ КНИГИ ---");
@@ -171,7 +158,7 @@ public class Library {
         System.out.print("Введите имя пользователя: ");
         String name = scanner.nextLine();
         
-        // Контакт задается вручную или "N/A"
+        // The contact is set manually or "N/A"
         System.out.print("Введите контактную информацию (email/телефон, или Enter для пропуска): ");
         String contact = scanner.nextLine();
         if (contact.trim().isEmpty()) {
@@ -207,7 +194,6 @@ public class Library {
             System.out.print("Новый автор (Enter для пропуска): "); 
             String newAuthor = scanner.nextLine();
             if (!newAuthor.isEmpty()) {
-                // bookToUpdate.setAuthor(newAuthor);
                 System.out.println("Автор обновлен.");
             }
             
@@ -215,7 +201,6 @@ public class Library {
             System.out.print("Новый ISBN (Enter для пропуска): "); 
             String newIsbn = scanner.nextLine();
             if (!newIsbn.isEmpty()) {
-                // bookToUpdate.setIsbn(newIsbn);
                 System.out.println("ISBN обновлен.");
             }
 
@@ -295,7 +280,7 @@ public class Library {
         if (choiceId != 0) {
             Book targetBook = findBook(choiceId);
             if (targetBook != null && !targetBook.getFilePath().equals("N/A")) {
-                // Эмуляция открытия файла
+                // Emulating file opening
                 SystemHelper.openFile(targetBook.getFilePath());
             } else {
                 System.out.println("Книга не найдена или цифровая копия недоступна.");

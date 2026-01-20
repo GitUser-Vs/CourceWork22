@@ -4,9 +4,9 @@ public class Account implements Serializable {
     private static final long serialVersionUID = 1L;
     
     private String username;
-    private String password; // В реальном мире - хеш
+    private String password;
     private Role role;
-    private int associatedId; // User ID или 0
+    private int associatedId;
 
     public Account(String user, String pass, Role r, int id) {
         this.username = user;
@@ -17,7 +17,7 @@ public class Account implements Serializable {
     
     public Account() {}
 
-    // Геттеры
+    // Getters
     public String getUsername() { return username; }
     public String getPassword() { return password; }
     public Role getRole() { return role; }

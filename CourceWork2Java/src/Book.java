@@ -1,4 +1,3 @@
-//import java.util.Objects; // Для использования Objects.hash, equals
 import java.io.Serializable;
 
 public class Book implements Serializable{
@@ -8,11 +7,10 @@ public class Book implements Serializable{
     private String title;
     private String author;
     private String isbn;
-    //private int quantity;
-    private String filePath; // Путь к файлу для чтения
+    private String filePath; // The path to the file to read
     private boolean isAvailable;
 
-    private static int nextBookId = 1; // Статическое поле для уникальных ID книг
+    private static int nextBookId = 1; // Static field for unique book IDs
     
     // Constructors
     public Book() {
@@ -30,7 +28,7 @@ public class Book implements Serializable{
     }
     
     public static int getNextBookId() {
-        return nextBookId++; // Возвращаем текущее значение и инкрементируем для следующего вызова
+        return nextBookId++; // return the current value and increment it for the next call.
     }
 
     // Public methods
@@ -39,17 +37,6 @@ public class Book implements Serializable{
                 + " | Автор: " + author + " | ISBN: " + isbn
                 + " | Статус: " + (isAvailable ? "Доступна" : "Выдана"));
     }
-
-	/*
-	 * public void decreaseAvailable() { if (available > 0) { available--; } else {
-	 * // Инициализация исключения throw new
-	 * IllegalStateException("Cannot decrease available quantity below zero for book '"
-	 * + this.title + "' (ID: " + this.bookId + ")"); } }
-	 * 
-	 * public void increaseAvailable() { if (available < quantity) { available++; }
-	 * else { System.out.println("Warning: Available quantity for '" + this.title +
-	 * "' is already at maximum."); } }
-	 */
 
     // Getters
     public int getId() { return bookId; }
@@ -64,28 +51,4 @@ public class Book implements Serializable{
     public void setAuthor(String author) { this.author = author; }
     public void setIsbn(String isbn) { this.isbn = isbn; }
     public void setAvailability(boolean status) { isAvailable = status; }
-    
-// Реализация клонирования
-    
-    // Поверхностное клонирование
-	/*
-	 * @Override public Object clone() { try { // Поверхностное копирование return
-	 * super.clone(); } catch (CloneNotSupportedException e) { throw new
-	 * InternalError(e); } }
-	 * 
-	 * // Глубокое клонирование public Book deepClone() { // Создаем новый объект и
-	 * копируем все поля Book newBook = new Book(this.bookId, this.title,
-	 * this.author, this.quantity); newBook.available = this.available; // Копируем
-	 * доступное количество return newBook; }
-	 * 
-	 * // Переопределение equals и hashCode для корректной работы с коллекциями
-	 * (например, HashSet)
-	 * 
-	 * @Override public boolean equals(Object o) { if (this == o) return true; if (o
-	 * == null || getClass() != o.getClass()) return false; Book book = (Book) o;
-	 * return bookId == book.bookId; // Считаем книги с одинаковым ID равными }
-	 * 
-	 * @Override public int hashCode() { return Objects.hash(bookId); // Хеш на
-	 * основе bookId }
-	 */
 }

@@ -6,18 +6,7 @@ public class FineCalculator {
 	private final int FINE_PER_DAY = 5;
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-    // Конструкторы
-//    public FineCalculator() {
-//        this.finePerDay = 0.5; // Значение по умолчанию
-//  
-//    }
-//
-//    public FineCalculator(double finePerDay) {
-//        this.finePerDay = (finePerDay > 0) ? finePerDay : 0.5;
-//
-//    }
-
-    // Публичные методы
+    // Public methods
     public double calculateFine(Transaction t) {
         if (!t.isActiveStatus()) {
         	return 0.0;
@@ -30,9 +19,6 @@ public class FineCalculator {
             long daysOverdue = ChronoUnit.DAYS.between(dueDate, today);
             return (double) daysOverdue * FINE_PER_DAY;
         }
-        return 0.0; // Нет штрафа, если книга возвращена вовремя или раньше
+        return 0.0; // There is no penalty if the book is returned on time or earlier.
     }
-
-    // Геттер
-//    public double getFinePerDay() { return finePerDay; }
 }
