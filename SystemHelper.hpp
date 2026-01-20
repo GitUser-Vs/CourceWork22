@@ -5,7 +5,7 @@
 class SystemHelper
 {
 public:
-    // ѕытаетс€ открыть файл с помощью системной команды
+    // Try to open a file using the system command
     static bool openFile(const std::string& path);
 };
 

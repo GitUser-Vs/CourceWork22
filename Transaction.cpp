@@ -10,7 +10,7 @@ using namespace std;
 
 string Transaction::getCurrentDate() const {
     time_t now = time(0);
-    tm t_local; // Используем локальную структуру
+    tm t_local;
 
     localtime_s(&t_local, &now);
 
@@ -31,12 +31,12 @@ Transaction::Transaction(int Id, int bookId, int userId)
 {
     borrowDate = getCurrentDate();
 
-    // Срок возврата - 14 дней
+    // The return period is 14 days.
     time_t now = time(0);
     now += 14 * 24 * 60 * 60;
     tm t_due;
 
-    // Безопасное получение времени для dueDate
+    // Secure time acquisition for DueDate
     localtime_s(&t_due, &now);
 
     stringstream ss;
@@ -65,11 +65,6 @@ void Transaction::completeTransaction()
 int Transaction::getTransactionId() const { return transactionId; }
 int Transaction::getBookId() const { return bookId; }
 int Transaction::getUserId() const { return userId; }
-//const std::tm& Transaction::getIssueDate() const { return m_issueDate; }
-//const std::tm& Transaction::getDueDate() const { return m_dueDate; }
-//const std::tm& Transaction::getReturnDate() const { return m_returnDate; }
-//bool Transaction::isReturned() const { return m_isReturned; }
-//double Transaction::getFineAmount() const { return m_fineAmount; }
 string Transaction::getDueDate() const { return dueDate; }
 bool Transaction::isActiveStatus() const { return isActive; }
 

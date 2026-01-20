@@ -1,22 +1,49 @@
 #include "FineCalculator.hpp"
 #include <iostream>
+#include <sstream>
+#include <iomanip>
+#include <ctime>
+#define _CRT_SECURE_NO_WARNINGS
+
+using namespace std;
 
 // constructors and destructor
-FineCalculator::FineCalculator() : m_finePerDay(0.5) // Default value
+string FineCalculator::getCurrentDateString() const
 {
+    time_t now = time(0);
+    tm t_local;
 
+    localtime_s(&t_local, &now);
+
+    stringstream ss;
+    ss << put_time(&t_local, "%Y-%m-%d");
+    return ss.str();
 }
 
-FineCalculator::FineCalculator(double finePerDay) : m_finePerDay(finePerDay > 0 ? finePerDay : 0.5)
+long FineCalculator::dateToDays(const string& dateStr) const
 {
+    tm t{};
+    stringstream ss(dateStr);
+    ss >> get_time(&t, "%Y-%m-%d");
 
+    // Converting time_t to long with explicit cast
+    time_t result_time = mktime(&t);
+    return static_cast<long>(result_time / (60 * 60 * 24));
 }
 
 // public methods
-double FineCalculator::calculateFine(int daysOverdue) const
+double FineCalculator::calculateFine (const Transaction& t) const
 {
-	return  (daysOverdue > 0) ? (daysOverdue * m_finePerDay) : 0.0;
-}
+	if (!t.isActiveStatus()) {
+        return 0.0;
+    }
+    string todayStr = getCurrentDateString();
+    long todayDays = dateToDays(todayStr);
+    long dueDays = dateToDays(t.getDueDate());
 
-// Getter
-double FineCalculator::getFinePerDay() const { return m_finePerDay; }
+    if (todayDays > dueDays) {
+        int daysOverdue = todayDays - dueDays;
+        return (double)daysOverdue * FINE_PER_DAY;
+    }
+    return 0.0;
+}

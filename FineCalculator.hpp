@@ -1,22 +1,17 @@
 #pragma once
 
+#include "Transaction.hpp"
 #include <iostream>
 
 class FineCalculator
 {
 private:
     // private variables
-    double m_finePerDay;
+    const int FINE_PER_DAY = 5;
+    std::string getCurrentDateString() const;
+    long dateToDays(const std::string& dateStr) const;
 
 public:
-    // constructors and destructor
-    FineCalculator();
-    FineCalculator(double finePerDay);
-    ~FineCalculator() = default;
-
     // public methods
-    double calculateFine(int daysOverdue) const;
-
-    // getter (if required)
-    double getFinePerDay() const;
+    double calculateFine(const Transaction& t) const;
 };

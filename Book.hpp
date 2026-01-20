@@ -10,7 +10,7 @@ private:
     std::string title;
     std::string author;
     std::string isbn;
-    std::string file_path; // Путь к цифровой копии
+    std::string file_path; // The path to a digital copy
 
     bool isAvailable;
     friend class Library;
@@ -25,7 +25,7 @@ public:
     std::string serialize() const;
     void deserialize(const std::string& data);
     
-    // Сеттеры
+    // setters
     void setAvailability(bool status);
     void setFilePath(const std::string& path) { file_path = path; }
 

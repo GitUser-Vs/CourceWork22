@@ -17,8 +17,6 @@ class Library
 
 private:
     // private variables
-
-    // Использование std::vector для хранения объектов
     std::vector<Book> books;
     std::vector<User> users;
     std::vector<Transaction> transactions;
@@ -37,7 +35,7 @@ private:
     int nextUserId;
     int nextTransactionId;
 
-    // Приватные методы для I/O
+    // Private methods for I/O
     void saveBooks();
     void loadBooks();
 
@@ -54,7 +52,6 @@ private:
     Book* findBook(int id);
     User* findUser(int id);
     Account* findAccount(const std::string& username);
-    //Transaction* findTransaction(int id);
 
 public:
     // constructors and destructor
@@ -65,21 +62,20 @@ public:
     void saveAllData();
     
     void addBook(bool is_digital = false);
-    void viewMyBooks(int userId) const; // Новая функция для пользователя
+    void viewMyBooks(int userId) const;
     void addUser();
     void updateBook();
 
-    // Операции
+    // Operations
     void borrowBook();
     void returnBook();
 
-    // Отображение
+    // Display
     void displayAllBooks() const;
     void displayAllUsers() const;
     void displayAllTransactions() const;
-    //Book* findBookById(int BookID);
 
-    // Методы аутентификации
+    // Authentication methods
     bool registerUser();
     bool login(std::string& currentUsername, Role& currentRole, int& currentUserId);
 

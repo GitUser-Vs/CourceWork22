@@ -148,6 +148,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="ReportGenerator.cpp" />
     <ClCompile Include="SearchEngine.cpp" />
+    <ClCompile Include="SystemHelper.cpp" />
     <ClCompile Include="Transaction.cpp" />
     <ClCompile Include="User.cpp" />
   </ItemGroup>
@@ -161,6 +162,7 @@
     <ClInclude Include="LibraryItem.hpp" />
     <ClInclude Include="ReportGenerator.hpp" />
     <ClInclude Include="SearchEngine.hpp" />
+    <ClInclude Include="SystemHelper.hpp" />
     <ClInclude Include="Transaction.hpp" />
     <ClInclude Include="User.hpp" />
     <ClInclude Include="Utils.hpp" />

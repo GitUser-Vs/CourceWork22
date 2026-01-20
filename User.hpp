@@ -16,7 +16,7 @@ private:
 public:
     // constructors and destructor
     User(int id, std::string n, std::string c);
-    User(); // Конструктор по умолчанию
+    User();
 
     int getId() const;
     std::string getName() const;

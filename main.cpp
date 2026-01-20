@@ -87,7 +87,7 @@ int main() {
             lms.registerUser();
         }
         else if (choice == 0) {
-            choice = -1; // Выход из цикла
+            choice = -1;
             break;
         }
         else {
@@ -112,7 +112,7 @@ int main() {
                 cout << "Некорректный ввод. Попробуйте снова." << endl;
                 continue;
             }
-            cin.ignore(); // Очистка буфера после выбора меню
+            cin.ignore(); // Clearing the buffer after selecting the menu
             
             if (activeRole == Role::ADMIN) {
                 switch (choice) {
@@ -127,11 +127,8 @@ int main() {
                 case 9: lms.displayAllUsers(); break;
                 case 10: lms.displayAllTransactions(); break;
                 case 11: lms.addBook(true); break;
-                case 0: /*choice = -1;*/
-                    // Деструктор Library будет вызван автоматически
-                    break;
-                default:
-                    cout << "Неверный пункт меню." << endl;
+                case 0: choice = -1; break; // Деструктор Library будет вызван автоматически
+                default: cout << "Неверный пункт меню." << endl;
                 }
             }
             else {
@@ -141,11 +138,11 @@ int main() {
                 case 3: lms.searchMenu(); break;
                 case 4: lms.displayAllBooks(); break;
                 case 5: lms.viewMyBooks(activeUserId); break;
-                case 0: /*choice = -1;*/ break;
+                case 0: choice = -1; break;
                 default: cout << "Неверный пункт меню." << endl;
                 }
             }
-        } while (choice != 0);
+        } while (choice != -1);
     }
     return 0;
 }

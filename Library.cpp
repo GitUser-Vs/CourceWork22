@@ -23,7 +23,7 @@ Library::~Library() {
     saveAllData();
 }
 
-// --- Реализации ввода-вывода ---
+// --- I/O implementations ---
 void Library::saveBooks() {
     ofstream ofs(BOOK_FILE);
     for (const auto& book : books) { ofs << book.serialize() << endl; }
@@ -45,7 +45,6 @@ void Library::loadBooks() {
     ifs.close();
 }
 
-// ... (Аналогично для users и transactions) ...
 void Library::saveUsers() {
     ofstream ofs(USER_FILE);
     for (const auto& user : users) { ofs << user.serialize() << endl; }
@@ -136,8 +135,6 @@ Account* Library::findAccount(const std::string& username) {
     return nullptr;
 }
 
-// --- Операции ---
-
 // --- Methods for working with books ---
 void Library::addBook(bool is_digital)
 {
@@ -153,12 +150,10 @@ void Library::addBook(bool is_digital)
     }
 
     books.emplace_back(nextBookId++, title, author, isbn);
-    books.back().setFilePath(path); // Устанавливаем путь
+    books.back().setFilePath(path); // Setting the path
     cout << "Книга добавлена с ID: " << books.back().getId() << endl;
 }
 
-
-// Новый метод для пользователя
 void Library::viewMyBooks(int userId) const {
     cout << "\n--- МОИ ВЫДАННЫЕ КНИГИ ---" << endl;
     bool found = false;
@@ -205,7 +200,7 @@ void Library::viewMyBooks(int userId) const {
         }
 
         if (targetBook) {
-            // Используем вспомогательный класс для открытия файла
+            // use an auxiliary class to open the file.
             SystemHelper::openFile(targetBook->getFilePath());
         }
         else {
@@ -213,8 +208,6 @@ void Library::viewMyBooks(int userId) const {
         }
     }
 }
-
-
 
 void Library::displayAllBooks() const
 {
@@ -298,37 +291,6 @@ void Library::returnBook() {
     }
 }
 
-//LibraryItem* Library::findBookById(int itemId) {
-//    auto it = std::find_if(m_items.begin(), m_items.end(),
-//        [itemId](const std::unique_ptr<LibraryItem>& item) {
-//            return item->getItemId() == itemId;
-//        });
-//
-//    if (it != m_items.end()) {
-//        return it->get();
-//    }
-//    return nullptr; // Книга не найдена
-//}
-
-//// Сортировка с использованием std::sort
-//void Library::sortItemsByTitle() {
-//    std::sort(m_items.begin(), m_items.end(),
-//        [](const std::unique_ptr<LibraryItem>& a, const std::unique_ptr<LibraryItem>& b) {
-//            // Сортируем по заголовку
-//            return a->getTitle() < b->getTitle();
-//        });
-//}
-//
-//void Library::displayAllItems() const {
-//    std::cout << "\n--- Library Contents ---\n";
-//    for (const auto& itemPtr : m_items) {
-//        // Вызов полиморфного метода displayInfo()
-//        itemPtr->displayInfo();
-//        std::cout << " | Qty: " << itemPtr->getQuantity() << "\n";
-//    }
-//}
-
-
 // --- Methods for working with users ---
 void Library::addUser()
 {
@@ -347,24 +309,6 @@ void Library::displayAllUsers() const
     for (const auto& user : users) { user.display(); }
 }
 
-//User* Library::findUserById(int UserID)
-//{
-//    // Проходим по вектору m_users
-//    for (auto& user : m_users) {
-//        if (user.getUserID() == UserID) {
-//            return &user; // Возвращаем адрес найденного объекта User
-//        }
-//    }
-//    return nullptr; // Пользователь не найден
-//}
-//
-//// --- Методы для работы с транзакциями ---
-//void Library::addTransaction(const Transaction& transaction)
-//{
-//    m_transactions.push_back(transaction); // Копирование объекта
-//    std::cout << "Added transaction to library system." << std::endl;
-//}
-
 void Library::displayAllTransactions() const
 {
     cout << "\n--- ИСТОРИЯ ТРАНЗАКЦИЙ ---" << endl;
@@ -372,123 +316,7 @@ void Library::displayAllTransactions() const
     for (const auto& t : transactions) { t.display(); }
 }
 
-//Transaction* Library::findTransactionById(int transactionId)
-//{
-//    for (auto& t : m_transactions) {
-//        if (t.getTransactionId() == transactionId) {
-//            return &t;
-//        }
-//    }
-//    return nullptr; // Транзакция не найдена
-//}
-//
-//// Поиск последней активной транзакции для данной книги и пользователя
-//Transaction* Library::findTransactionByBookUser(int bookId, int userId)
-//{
-//    Transaction* lastActiveTransaction = nullptr;
-//    for (auto& t : m_transactions) {
-//        if (t.getBookId() == bookId &&
-//            t.getUserId() == userId &&
-//            !t.isReturned())
-//        {
-//            // Сохраняем указатель невозвращенной транзакции
-//            lastActiveTransaction = &t;
-//        }
-//    }
-//    return lastActiveTransaction;
-//}
-//
-//// --- Methods using aggregated objects ---
-//void Library::processLending(int BookID, int UserID)
-//{
-//    std::cout << "\nProcessing lending for Book ID " << BookID << " to User ID " << UserID << "..." << std::endl;
-//    LibraryItem* itemPtr = findBookById(BookID);
-//    Book* book = dynamic_cast<Book*>(itemPtr);
-//    //Book* book = findBookById(BookID);
-//    User* user = findUserById(UserID);
-//
-//    // Проверка на отсутствие книги или пользователя
-//    if (!book) {
-//        std::cout << "Lending failed. Book with ID " << BookID << " not found." << std::endl;
-//        return;
-//    }
-//    if (!user) {
-//        std::cout << "Lending failed. User with ID " << UserID << " not found." << std::endl;
-//        return;
-//    }
-//
-//    // Проверяем, есть ли у пользователя место для взятия новой книги
-//    if (user->borrowBook(BookID)) {
-//        book->decreaseAvailable();
-//        std::cout << "Lending successful. Book '" << book->getTitle() << "' lent to '" << user->getName() << "'." << std::endl;
-//
-//        // Создаем новую транзакцию
-//        std::tm issueDate = getCurrentTm();
-//        std::tm dueDate = addDaysToTm(issueDate, 14);
-//
-//        // Создаем транзакцию с уникальным ID
-//        Transaction newTransaction(static_cast<int>(m_transactions.size()) + 1, BookID, UserID, issueDate, dueDate);
-//        addTransaction(newTransaction);
-//    }
-//}
-//
-//void Library::processReturn(int BookID, int UserID)
-//{
-//    std::cout << "\nProcessing return for Book ID " << BookID << " by User ID " << UserID << "..." << std::endl;
-//    LibraryItem* itemPtr = findBookById(BookID);
-//    Book* book = dynamic_cast<Book*>(itemPtr);
-//    //Book* book = findBookById(BookID);
-//    User* user = findUserById(UserID);
-//
-//    if (!book) {
-//        std::cout << "Return failed. Book with ID " << BookID << " not found." << std::endl;
-//        return;
-//    }
-//
-//    if (!user) {
-//        std::cout << "Return failed. User with ID " << UserID << " not found." << std::endl;
-//        return;
-//    }
-//
-//    Transaction* activeTransaction = findTransactionByBookUser(BookID, UserID);
-//    if (!activeTransaction) {
-//        std::cout << "Return failed. No active lending transaction found for Book ID " << BookID << " and User ID " << UserID << "." << std::endl;
-//        return;
-//    }
-//
-//    std::tm returnDate = getCurrentTm();
-//    double fine = 0.0;
-//
-//    std::time_t returnTime = std::mktime(const_cast<std::tm*>(&returnDate));
-//    std::time_t dueTime = std::mktime(const_cast<std::tm*>(&activeTransaction->getDueDate()));
-//
-//    if (returnTime > dueTime) {
-//        int daysOverdue = static_cast<int>((returnTime - dueTime) / (60 * 60 * 24));
-//        fine = m_fineCalculator->calculateFine(daysOverdue);
-//    }
-//
-//    activeTransaction->markAsReturned(returnDate, fine);
-//
-//    if (user->returnBook(BookID)) {
-//        book->increaseAvailable();
-//        std::cout << "Return successful. Book '" << book->getTitle() << "' returned by '" << user->getName() << "'." << std::endl;
-//        if (fine > 0) {
-//            std::cout << "  Fine incurred: $" << fine << std::endl;
-//        }
-//    }
-//    else {
-//        std::cout << "Return warning: User '" << user->getName() << "' count mismatch after return." << std::endl;
-//    }
-//}
-//
-//void Library::performSearch(const std::string& query)
-//{
-//    std::cout << "\nPerforming search in Library..." << std::endl;
-//    m_searchEngine->searchBooks(query);
-//    m_searchEngine->searchUsers(query); 
-//}
-
-// --- Аутентификация ---
+// --- Authentication ---
 bool Library::registerUser() {
     string username, password;
     cout << "--- РЕГИСТРАЦИЯ (Роль по умолчанию: USER) ---" << endl;
@@ -501,11 +329,11 @@ bool Library::registerUser() {
 
     cout << "Введите пароль: "; getline(cin, password);
 
-    // Сначала регистрируем нового пользователя в списке пользователей
-    users.emplace_back(nextUserId++, username, "N/A"); // Контакт изначально "N/A"
+    // registering a new user in the user list
+    users.emplace_back(nextUserId++, username, "N/A"); // Contact initially "N/A"
     int newUserId = users.back().getId();
 
-    // Регистрируем аккаунт с ролью USER, связанный с новым ID
+    // Registering an account with the USER role associated with the new ID
     accounts.emplace_back(username, password, Role::USER, newUserId);
 
     cout << "Регистрация успешна! Ваш User ID: " << newUserId << endl;
@@ -528,7 +356,7 @@ bool Library::login(std::string& currentUsername, Role& currentRole, int& curren
     if (acc->getPassword() == password) {
         currentUsername = acc->getUsername();
         currentRole = acc->getRole();
-        currentUserId = acc->getAssociatedId(); // User ID, если роль USER
+        currentUserId = acc->getAssociatedId();
         cout << "Вход успешен. Роль: " << (currentRole == Role::ADMIN ? "АДМИНИСТРАТОР" : "ПОЛЬЗОВАТЕЛЬ") << endl;
         return true;
     }
@@ -539,7 +367,7 @@ bool Library::login(std::string& currentUsername, Role& currentRole, int& curren
 }
 
 
-// --- Специализированные ---
+// --- Specialized ---
 void Library::generateReports() const
 {
     int choice;

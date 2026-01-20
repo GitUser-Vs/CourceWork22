@@ -10,21 +10,21 @@ bool SystemHelper::openFile(const string& path) {
         return false;
     }
 
-    // --- Кросс-платформенная эмуляция открытия файла ---
+    // --- Cross-platform emulation of file opening ---
 #ifdef _WIN32
-    // Windows (использует start для открытия файла соответствующей программой)
+    // Windows (uses "start" to open the file with the appropriate program.)
     string command = "start \"\" \"" + path + "\"";
 #elif __APPLE__
     // macOS
     string command = "open \"" + path + "\"";
 #else
-    // Linux (использует xdg-open)
+    // Linux (uses xdg-open)
     string command = "xdg-open \"" + path + "\"";
 #endif
 
     cout << "Попытка открыть файл: " << path << endl;
 
-    // Выполнение команды в ОС
+    // Executing a command in the OS
     int result = system(command.c_str());
 
     if (result == 0) {
